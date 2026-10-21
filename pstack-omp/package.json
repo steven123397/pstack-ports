@@ -1,0 +1,12 @@
+{
+  "name": "pstack-omp",
+  "version": "0.15.29-omp1",
+  "private": true,
+  "description": "pstack adapted for omp. if you want to go fast, go deep first. rigorous agent workflows you can parallelize with confidence.",
+  "omp": {
+    "name": "pstack-omp",
+    "version": "0.15.29-omp1",
+    "description": "pstack adapted for omp. if you want to go fast, go deep first. rigorous agent workflows you can parallelize with confidence.",
+    "keywords": ["pstack", "poteto-mode", "workflow", "principles", "agent-style", "subagents", "unslop"]
+  }
+}
