@@ -1,6 +1,6 @@
 ---
 name: setup-pstack
-description: Configure which models pstack uses per role and at what thinking level. Detects your available models and writes omp modelRoles entries that override the inherit-parent default. Use for /setup-pstack, "configure pstack models", "pstack budget", or changing pstack's model choices.
+description: Configure which models pstack uses per role and at what thinking level. Detects your available models and writes omp modelRoles entries that override the inherit-parent default. Use for /skill:setup-pstack, "configure pstack models", "pstack budget", or changing pstack's model choices.
 ---
 
 # Setup pstack
@@ -14,7 +14,7 @@ pstack routes work by role, and each role is pinned by one agent definition. The
 | `@pstack-fast` | `pstack-worker` agent | Code delegates: playbook work (feature, bug-fix, refactoring, perf-issue, hillclimb), swarm workers, how explorers, why investigators, reflect tooling. Default for every worker unless a panel seat assigns `pstack-panel` per arm. |
 | `@pstack-judge` | `pstack-judge` agent | Judgment and prose: hardest tasks, how explainers, why synthesizers, reflect judgment/divergent/synthesizer, arena cross-judge. |
 | `@pstack-panel` | `pstack-panel` agent | Second seat of multi-model panels (arena runners, architect runners, interrogate reviewers). Pick a different model family from `@pstack-fast`, or the panel loses its point. |
-| — (no role) | `pstack-reader` agent | Read-only investigation always inherits the parent session model. |
+| `@pstack-fast` | `pstack-reader` agent (read-only) | Read-only investigation: explorers, evidence gathering. Its `tools` list has no write tools, so it cannot edit. |
 
 A role left unset inherits the parent session model. That is the out-of-box default for all three: pstack works before setup, just without model diversity.
 

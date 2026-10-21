@@ -8,6 +8,8 @@ disable-model-invocation: true
 ---
 # How to make a bot UI
 
+omp has no Cursor Automations runtime: no routines, no `update_state` routine target, no `SendToUser` secret requests, and no `api2.cursor.sh` webhook. This skill cannot run in omp. Say `Skipped in omp: Cursor Automations webhook.` and stop. The rest of this file is the upstream procedure, kept for the Cursor runtime.
+
 Build a page the user clicks. A server on this computer POSTs JSON to a webhook routine. The bot wakes with that JSON. Keep the sender key on the server. Do not put the sender key in the browser, in chat, or in this skill.
 
 ## Create the webhook routine

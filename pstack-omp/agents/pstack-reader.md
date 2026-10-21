@@ -2,6 +2,7 @@
 name: pstack-reader
 description: Read-only investigator for pstack. Use for codebase research, evidence gathering, and locating behavior where no edits are wanted. Never edits files.
 tools: read, grep, glob, web_search
+model: "@pstack-fast"
 ---
 
 # pstack reader
