@@ -61,9 +61,25 @@ elif raw=$(gh pr list --author "@me" --state all --limit 1000 \
 fi
 [ -s "$prs" ] || echo "[]" > "$prs"
 
-# Transcripts dir: ~/.cursor/projects/<slugified-repo-path>/agent-transcripts.
-slug=$(printf '%s' "$main_wt" | sed 's#^/##; s#/#-#g')
-transcripts="$HOME/.cursor/projects/$slug/agent-transcripts"
+# Sessions dir: ~/.omp/agent/sessions/<bucket>, where <bucket> encodes the
+# canonical cwd: home-relative is -<rel>, temp-relative is -tmp-<rel>, anything
+# else is --<abs>--. Path separators (and the drive colon) become dashes.
+# Transcripts are the session JSONL files directly under that bucket.
+normalize_path() {
+	if command -v cygpath >/dev/null 2>&1; then cygpath -m "$1"; else printf '%s' "$1"; fi
+}
+omp_bucket() {
+	p=$(normalize_path "$1"); p=${p%/}
+	h=$(normalize_path "$HOME"); h=${h%/}
+	t=$(normalize_path "${TMPDIR:-${TEMP:-/tmp}}"); t=${t%/}
+	case "$p" in
+	"$h") printf -- '-\n' ;;
+	"$h"/*) printf -- '-%s\n' "${p#"$h"/}" | tr '/' '-' ;;
+	"$t"/*) printf -- '-tmp-%s\n' "${p#"$t"/}" | tr '/' '-' ;;
+	*) printf -- '--%s--\n' "$p" | tr ':/' '--' ;;
+	esac
+}
+transcripts="$HOME/.omp/agent/sessions/$(omp_bucket "$main_wt")"
 now=$(date +%s)
 
 echo "# base: $base"
@@ -104,10 +120,12 @@ git worktree list --porcelain | awk '/^worktree /{print $2}' | while read -r wt;
 	# followed by "/" or a quote so glint-482 does not match glint-482-r37.
 	last="-"; last_ts=0
 	if [ -d "$transcripts" ]; then
-		f=$(rg -l -e "${wt}/" -e "${wt}\"" "$transcripts" 2>/dev/null \
-			| xargs stat -f '%m %N' 2>/dev/null | sort -rn | head -1)
+		f=$(rg -l -F -e "${wt}/" -e "${wt}\"" "$transcripts" 2>/dev/null \
+			| while IFS= read -r t; do
+				stat -c '%Y %n' "$t" 2>/dev/null || stat -f '%m %N' "$t" 2>/dev/null
+			done | sort -rn | head -1)
 		if [ -n "$f" ]; then last_ts=$(echo "$f" | awk '{print $1}')
-			last=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null); fi
+			last=$(date -d "@$last_ts" '+%Y-%m-%d' 2>/dev/null || date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null); fi
 	fi
 	recent=$([ "$last_ts" -gt 0 ] 2>/dev/null && [ $(( (now - last_ts) / 86400 )) -le 4 ] && echo yes || echo no)
 
