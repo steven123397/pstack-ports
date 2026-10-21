@@ -1,0 +1,181 @@
+---
+title: "验证结果并开 PR"
+description: "能编译不等于有证据。本页讲怎么写明完结条件、核对测出来的数字、为应用生成验证 skill、开 PR，再把 PR 一路推到合并。"
+sourceUrl: "https://github.com/cursor/plugins/blob/d457567332aa6989e753ea289f30ea2bfbc80bc0/pstack/docs/guide/06-verify-and-ship.md"
+meta:
+  updated_at: "2026-10-20T09:36:32+08:00"
+  updated_by: "kimi-code-cli"
+  triggered_by: "routine pstack-daily-translate"
+  translation:
+    model: "kimi-code/k3"
+    effort: "default"
+    translated_at: "2026-10-20T09:36:32+08:00"
+    source_commit: "d457567332aa6989e753ea289f30ea2bfbc80bc0"
+    source_version: "0.15.28 / d457567"
+---
+
+> [!NOTE]
+> **来源**
+>
+> 这是中文译文，方便对照阅读。本站不发行中文版插件。
+>
+> 对照英文：[本站英文页](https://pstack.ganhai.cloud/en/skills-zh/official-guide/06-verify-and-ship/)
+>
+> 英文原文出处：cursor/plugins 仓库 [`pstack/docs/guide/06-verify-and-ship.md`](https://github.com/cursor/plugins/blob/d457567332aa6989e753ea289f30ea2bfbc80bc0/pstack/docs/guide/06-verify-and-ship.md)（提交 `d457567`）
+
+# 验证结果并开 PR
+
+「能编译」不是证据。[Prove It Works 原则](../skills/principle-prove-it-works/SKILL.md) 要求 agent 先检查真实产物，再报告成功。你的任务，是让这个「真实产物」有办法检查。本页讲六件事：写明完结条件，核对测出来的数字，为你的应用生成验证 skill，对测试很难覆盖的性质做形式化验证，开 PR，再把 PR 一路推到合并。
+
+验证通常是 agent 工作里最慢的一步，因为这一步常常在等人。让 agent 自己做，你就不再是瓶颈。跳过它，多开几个 agent，只是多出几份没核对过的活要审。
+
+![一架原型机在真实的试飞航线上飞行。她拿着秒表计时，几个机器人在拍摄，并对照清单逐项核对这次试飞。终端上显示 verify: pass, evidence: captured。](https://pstack.ganhai.cloud/guide/verification.jpg)
+
+## 一开始就写明完结条件
+
+在第一条提示词里就写明怎样才算做完，用什么说法都行：
+
+```text
+/poteto-mode add json output to this command. text output stays byte-identical, the json parses, both run against the sample project. show me the evidence.
+```
+
+这样 agent 手里有了三项能跑的检查，不用再去猜你满不满意。agent 回复时，应该附上它跑过的确切命令和输出。某项检查跑不了，好的回复会写明「inconclusive」（无法下结论）。如果回复说得很笃定，却拿不出证据，你要把它当成危险信号。
+
+检查要跟改动对得上：
+
+- CLI 改动，就跑真实的命令。
+- UI 改动，就在运行中的应用里把改过的流程走一遍。必须跟参考图一个像素都不差时，[Visual parity playbook](../skills/poteto-mode/playbooks/visual-parity.md) 拿截图跟冻结的基线比，不靠肉眼判断。
+- 解析器或迁移，就拿一份存好的输入重放一遍。
+- 性能改动，就对比改动前后的性能剖析。
+- 存储改动，就把写进去的值读回来。
+
+证据要一份你自己能打开看的产物：先失败再通过的测试、改动前后的视频、trace、截图。修复已经合并了，就在主干上再跑一遍同样的检查。产物比一套说得通的解释强，因为你可以质疑它，而不必把整次运行重来一遍。
+
+如果有一份小 diff 你不完全放心，[`/blast-radius`](../skills/blast-radius/SKILL.md) 会找出它可能在别处弄坏什么。它挑出让这次改动安全的那一个事实，然后跑代码证明它，而不是写一篇长文来论证。
+
+<a id="vet-a-measured-number-with-benchmark-checklist"></a>
+## 用 `/benchmark-checklist` 核对数
+
+改动前后的数字，最容易一不小心就量错。一边是热缓存，一边是 debug 构建，或者计时区间里根本没跑到那份活，都能造出一份看起来很像的加速。在你汇报或依据一个数字行动之前，键入：
+
+```text
+/benchmark-checklist vet the export speedup before it goes in the pr
+```
+
+[`/benchmark-checklist`](../skills/benchmark-checklist/SKILL.md) 问七个问题，每个都要一次真实跑出来的证据：
+
+1. 是什么在限制这个数字，它为什么不是两倍？
+2. 每一边都按生产环境那样调过了吗？
+3. 结果有没有打破物理上限，比如磁盘带宽或核心数？
+4. 有没有报错，或返回了错的输出？
+5. 交替跑几轮还能复现吗？中位数和范围是多少？
+6. 放到用户真正等的那条路径上，端到端还重要吗？
+7. 被测的活真的发生在计时区间里了吗？
+
+结论是更快、更慢、测不出差别，或 inconclusive，并带上跑了几轮、范围，以及限制因素。说不清限制因素，或某一边没按生产那样调，就报 inconclusive。`/poteto-mode` 已经在 Perf issue 和 Hillclimb playbook 里跑这份清单。你自己键入，是在它们外面量了什么，或者别人的数字看起来太好看。它就是 [Explain the Number 原则](../skills/principle-explain-the-number/SKILL.md) 的干活形态。
+
+<a id="create-a-project-verification-skill"></a>
+
+## 为项目创建验证 skill
+
+上面讲 UI 的那一条，背后藏着一个实际的要求。agent 需要一种能用脚本操作你应用的办法。项目里已经有了，那最好。没有的话，运行：
+
+```text
+/create-verification-skill
+```
+
+[`/create-verification-skill`](../skills/create-verification-skill/SKILL.md) 找仓库要答案，不找你。它要弄清这几件事：用户会碰到哪些地方，应用在本地怎么启动，用什么来操作它，什么证据能证明行为，两个实例能不能同时跑。操作手段优先用项目里现成的 harness（用来启动和操作应用的测试程序），没有的话，再用浏览器加 CDP、PTY（伪终端），或者直接发 HTTP 请求。只有代码答不出来的问题，它才来问你。
+
+它会写出 `.cursor/skills/verify-<app>/`。里面是写给 agent 看的说明，分成 Launch、Doctor、Drive、Evidence、Cleanup 几节，每节都写得很具体。如果附带了脚本，还会有一个 Helpers 节。`features/` 下面还有一份 feature map，列出应用的各项功能，以及每项功能用什么结果来证明可用。这个 skill 自带一份[完整的 feature map 示例](../skills/create-verification-skill/references/feature-map-example/README.md)，包括一个 README 索引，每个功能一个文件，每个文件都用规定的四个二级标题。交给你之前，生成器会把这个 skill 从头到尾跑通一次：启动，doctor 检查，操作一个功能，采集证据，清理，再确认清理后证据仍然保留。这一遍没跑通，就别用它生成的东西。
+
+从此以后，在这个仓库里，「在应用里验证一下」就成了任何 agent 都能执行的一步，不用先聊一轮怎么配置。想要某种具体形态的证据时，在提示词里点名：
+
+```text
+/poteto-mode build the bulk-archive action. use /verify-<app> to verify your changes and show me a video and screenshots as proof.
+```
+
+```text
+/poteto-mode repro this with /verify-<app>. if it repros on main, fix it and show me a video as proof.
+```
+
+验证 skill 能用以后，可以让 [`/swarm`](../skills/swarm/SKILL.md) 按 feature map 的条目把一整轮验证拆开，再汇总结果。一群验证者还能在够大的样本上确认一次性能提升，或在 PR 交付前对应用做 fuzz，找回归。
+
+把验证 skill 当成基础设施，不是一次性的东西。把它提交进去，团队里每个人、每个 agent 都用同一套办法操作应用。然后[做出杠杆](../skills/principle-build-the-lever/SKILL.md)。agent 老是写用完就扔的脚本去点应用时，要一个小的 control CLI，让 skill 去调它。agent 少花 token，每一次跑都变得可重复。agent 用得顺的 CLI 有这些特点：
+
+- 少数几条能组合的命令，每一条都干真活，不要很多薄命令。
+- 会破坏东西的操作都带 `--dry-run`。
+- 子命令逐步露出功能，不要一次摊开。
+- 报错说明接下来该做什么。
+- `--help` 写得充分。
+- 机器能读的输出，比如 JSON。
+
+既然在做这件事，也把开发环境做成可重复的：种好的数据、测试用户，以及一条每次都能把环境拉起来的命令。
+
+## 让验证 skill 跟上应用
+
+应用会变，feature map 会过时。至少每天跑一次。最好交给定时自动化，这样就没人需要记着：
+
+```text
+/maintain-verification-skill
+```
+
+[`/maintain-verification-skill`](../skills/maintain-verification-skill/SKILL.md) 会审查生成出来的 skill。它先按功能拆开，每个功能一路，并行读源码，全程只读不写。然后实际跑一轮，把 feature map 里的每个功能都操作一遍。最后的结果一定是下面三种之一。`clean` 表示全部覆盖到了，没有东西要提交。`changed` 表示有一个 PR，里面是验证过的修正，改动只限于验证 skill 自己的目录。`blocked` 会写明卡在哪里。它从不改产品代码。实际跑的那一轮如果发现产品回归，它会报告这个回归，不会在文档里把它糊弄过去。
+
+<a id="prove-a-property-with-a-formal-verification-skill"></a>
+## 用形式化验证 skill 证明一条性质
+
+验证 skill 证明的是你实际走过的路径。有些 bug 藏在没人走的路径上：两次重试叠在一起，锁在写入中途过期，状态变化乱序到达。测试很难碰到这些情况。如果这类 bug 在你的代码里代价很高，就运行：
+
+```text
+/create-formal-verification-skill
+```
+
+[`/create-formal-verification-skill`](../skills/create-formal-verification-skill/SKILL.md) 会从代码里选择目标：代码承诺始终成立的一条性质。它一旦失守会伤害用户，测试又很难碰到让它失守的情况。它选最值得验证的目标，不是最容易验证的。也可以点名一个范围或 bug，让它从那里开始：
+
+```text
+/create-formal-verification-skill the job lease and retry logic. a job must never run twice at once.
+```
+
+问题本身决定工具。要检查事件是否可能按错误顺序发生，适合先为设计建立一个小模型，再用模型检查器，TLA+ 在任何语言里都是这个用途的默认选择。要检查代码是否对每种输入都正常，适合用直接针对代码运行的验证器。你的语言上没有可用的验证器时，agent 会直说，然后用生成的输入测试真实代码，而不是手写一份函数的模型。一条性质如果必须在任意规模下成立，就可能需要形式化证明。agent 会说明它选了哪种工具，以及为什么。
+
+它验证一条性质，还会在一个破坏这条性质的代码变体上展示它如何失守。从没见过失败的检查，什么也证明不了。如果当前代码已经违反这条性质，你会拿到一个反例。反例用你代码里的概念写成一小串步骤。性质按原样保留，发现的问题也不会被抹掉。除非你要求，否则不会改产品代码。
+
+它会生成一个只属于本项目的 skill，告诉下一个 agent 怎么判断改动是否碰到已验证的代码，怎样用一条命令运行检查，以及怎样区分真正的 bug 和建模错误。交给你之前，生成器会在一个破坏该性质的临时改动上照这份 skill 走一遍，检查必须抓住问题。交付说明会写明验证了什么、用了哪种工具、验证边界是什么、检查发现了什么，以及没有覆盖什么。通过只覆盖这个模型或设定的边界，不代表整个系统。
+
+这份 skill 还会记录每条检查覆盖哪些代码，以及检查最后一次与代码相符是在哪个提交。绕过这份 skill 的合并和重构，可能让检查在一份描述着已消失代码的模型上继续通过。在这之后，运行 [`/maintain-formal-verification-skill`](../skills/maintain-formal-verification-skill/SKILL.md)。它根据代码更新验证，重新运行，证明每条更新后的检查仍然能失败，并告诉你每个失败是验证里的漂移还是代码里的 bug。
+
+## 开 PR
+
+```text
+/poteto-mode open the pr. small ordered commits, evidence in the description.
+```
+
+[Opening a PR playbook](../skills/poteto-mode/playbooks/opening-a-pr.md) 在 worktree（同一个仓库的另一份独立工作目录）里干活。它用 rebase 把改动整理成几个有序的小提交，清理 diff，再用 unslop 去掉文字里的 AI 腔，最后返回 PR 链接。五个范围窄的 PR 胜过一个臃肿的大 PR。把后续改动叠成新的 PR，也胜过让一个分支越长越大。
+
+## 用 Babysit 把 PR 推到可合并
+
+PR 一开，挡住合并的问题马上开始堆积。检查会挂，审查者会留评论，主干也在往前走。把这些来回折腾交给 [Babysit playbook](../skills/poteto-mode/playbooks/babysit.md)：
+
+```text
+/poteto-mode babysit this pr. get it green.
+```
+
+Babysit 会盯着 PR，在 GitHub 上用自带的监视脚本；Origin CLI 可用时，也可以用 Origin CLI。它按顺序处理问题：先解决冲突，再处理审查评论，最后是 CI。已知的修复会攒在一起，一次推送上去。这样检查只重跑一次，不用每修一处就重跑一遍。它筛评论时抱着怀疑的态度，因为人和机器人都会把真问题和噪声提在同一张列表里。真的 finding（审查中发现的问题）就修。噪声就驳回，并把反驳的证据贴在那条评论下面。如果你只想知道现状，就问得小一点。Babysit 会直接回答，不会启动那套循环：
+
+```text
+/poteto-mode check on pr 123. anything outstanding?
+```
+
+Babysit 推到可合并就停。哪怕全绿，它也从不合并，因为合并是另一个决定。
+
+## 用 Shipping 合并整叠 PR
+
+全绿不等于安全。准备好合并时，直接说：
+
+```text
+/poteto-mode land the stack.
+```
+
+[Shipping playbook](../skills/poteto-mode/playbooks/shipping.md) 在给任何 PR 开启合并之前，先逐个独立验证。每个 PR 都由一个新开的 agent 实地证明行为，评判改动的 agent 永远不是写这个改动的那一个。然后 Shipping 从最底下开始，只合并连续通过验证的那一段。它一次合并一个 PR，默认走 GitHub，Origin 的 CLI 可用时走 Origin，最后报告链条断在哪个 PR。如果一个通过验证的 PR 压在一个没验证的 PR 上面，它就得等。现在合并它，会把底下那个没验证的缺口一起带进去。
+
+下一篇：[睡觉时让工作继续跑](./07-overnight.md)。
