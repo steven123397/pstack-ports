@@ -40,7 +40,7 @@
 | `resume` | `write agent://<id>`（活/驻留 agent 消息即复活） |
 | （无） | `solutionSpace` **必填**：子问题开放度描述，喂给思考分级器 |
 
-**核心教训：Cursor 的 model-per-task-item 在 omp 是 model-per-agent-type + modelRoles。** 适配多模型面板（arena/interrogate 的"每席位一个模型"）需要为每个席位造一个命名 agent（`pstack-worker-2` = `@pstack-panel`），skill 正文说 agent 名，setup skill 写 modelRoles 值。用户换模型只动 config.yml，不动 skills。
+**核心教训：Cursor 的 model-per-task-item 在 omp 是 model-per-agent-type + modelRoles。** 适配多模型面板（arena/interrogate 的"每席位一个模型"）需要为每个席位造一个命名 agent（`pstack-panel` = `@pstack-panel`），skill 正文说 agent 名，setup skill 写 modelRoles 值。用户换模型只动 config.yml，不动 skills。
 
 ### 模型配置
 

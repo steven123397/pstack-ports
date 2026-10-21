@@ -46,7 +46,7 @@ This plugin's skills never name a raw model. They name *roles*, and each role is
 | --- | --- | --- | --- |
 | fast worker (was `grok-4.7-xhigh-fast`) | `pstack-worker.md` | `@pstack-fast` | code delegates, explorers, investigators, swarm workers |
 | judge (was `claude-opus-5-5-xhigh`) | `pstack-judge.md` | `@pstack-judge` | explainers, synthesizers, reviewers, prose and judgment |
-| extra panel seat | `pstack-worker-2.md` | `@pstack-panel` | second model family for arena runners / interrogate reviewers when configured |
+| extra panel seat | `pstack-panel.md` | `@pstack-panel` | second model family for arena runners / interrogate reviewers when configured |
 
 `/skill:setup-pstack` configures what these roles resolve to by writing `modelRoles.pstack-fast` / `pstack-judge` / `pstack-panel` in `~/.omp/agent/config.yml`. Defaults if unconfigured: the roles resolve to the parent session's active model (all three unset), which matches `inherit-parent`. Panel diversity then comes only from what the user configured.
 
@@ -57,6 +57,7 @@ Rules for every spawn:
 - omp thinking suffixes (`:low`/`:medium`/`:high`/`:xhigh`/`:max`) ride the `modelRoles` value, e.g. `anthropic/claude-opus-5-5:max`. The effort ladder maps Cursor's `medium`/`high`/`xhigh`/`max` tokens onto these suffixes.
 - If a role resolves to nothing available, omp falls back to the parent model; say so in the reply rather than failing the spawn.
 - `task.enableEffort` (default off) gates the per-item `effort: lo|med|hi` field. When a skill wants a reasoning tier for one spawn, prefer the role's `modelRoles` value over relying on `effort`.
+- A `modelRoles` value may itself alias a built-in chat role, e.g. `pstack-judge: "@slow"`. Skills still name only the `pstack-*` roles; pointing them at `@smol`/`@default`/`@slow` is a config-time shortcut setup-pstack may offer, never a skill-side hardcode.
 
 ## setup-pstack
 
