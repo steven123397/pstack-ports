@@ -98,7 +98,7 @@ omp has no native Cursor Automations or Bugbot. Cursor cloud agents are replaced
 | Cursor | omp |
 | --- | --- |
 | Cursor Automations: routines, webhooks, routine wakes, `SendToUser` secret requests | Skip with the line. |
-| Bugbot | GitHub PR review comments are ordinary review threads; triage them with `gh` or the `issue://`/`pr://` internal URLs. Skip a step that starts, waits for, or configures Bugbot when the PR has no such check or comment. |
+| Bugbot | No replacement in omp. When a step starts, waits for, or configures Bugbot, write `Skipped in omp: <step>. Bugbot is not available.` and continue. Human or other-bot review threads still exist; triage them normally. `watch-pr` treats any unresolved thread as a blocker. |
 | Cursor cloud agents | Dispatch a Jules session with `poteto-mode/scripts/jules-cloud.mjs` as in Cloud workers. Not a skip. Skip only a step that needs the Cursor dashboard or that agent's VM identity. |
 | A built-in PR tool | `gh pr create`, or `pr://` internal URLs for reading. Not a skip. |
 | `/loop` | omp has it built in: `/loop [count\|duration] [--while\|--until <check>]`. Not a skip. |

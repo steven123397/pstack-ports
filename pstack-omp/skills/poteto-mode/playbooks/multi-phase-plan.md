@@ -56,7 +56,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 - [ ] Open the PR ready, never draft, per **Opening a PR**. Use the run's built-in PR tool when it has one, else `origin pr create --status open --base <base-branch>` or `gh pr create --base <base-branch>` according to the resolved forge. A stack child targets its parent branch.
 - [ ] Run the repo's lint and typecheck once before the PR-facing push. Push with hooks on.
 - [ ] Run `/deslop` before each commit and `/skill:no-comments` before review.
-- [ ] Triage every Bugbot and security-reviewer comment per `../references/bugbot-triage.md`.
+- [ ] If the PR has review threads, triage them per `../references/review-triage.md`. A Bugbot-specific step is skipped in omp with the skip line.
 - [ ] Rebase onto current trunk before the code-ready report and babysit. Keep that merge base in fix rounds. Rebase again only at merge prep, on a `git merge-tree` conflict with trunk, or on a CI failure that comes from a change on trunk.
 
 ### Verdict and merge, for every PR
@@ -125,7 +125,7 @@ Each live lane is a Jules cloud session at the PR head, dispatched with `jules-c
 **Merge.**
 
 - [ ] Root's clean verdict at the exact head SHA.
-- [ ] Bugbot triage done.
+- [ ] Review threads resolved, or none exist.
 - [ ] Rebased onto current trunk after the verdict, patch-id unchanged.
 - [ ] <The owner squash-merges its own PR, or the root appends it to the base-branch stack and the operator lands it bottom-up.>
 

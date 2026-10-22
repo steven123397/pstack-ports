@@ -93,5 +93,6 @@ omp 无对应物的（Automations/Bugbot）：skill 步骤保留，执行时输�
 - `isolated: true` 要求 `task.isolation.enabled: true`（omp 默认 off），skills 降级为共享 checkout + 注明。
 - Jules 云 worker 依赖 `JULES_API_KEY` 和已授权的 GitHub 仓库；API 无 cancel 端点，只读 session 答完后可能长期停在 `IN_PROGRESS`，要用 `result` 读答案而不是等 `COMPLETED`。
 - Qoder Cloud Agents MCP 未作为默认路径：它是通用沙箱，需 setup script 自行 clone，且不自动产出 PR。
+- Bugbot 环节跳过：omp 没有自动 PR 评审。人类或其他 bot 留下的 review thread 仍按 `review-triage.md` 分诊，未解决线程仍会阻塞 `watch-pr` 的 `READY`；只是不再等待或配置 Bugbot。
 - omp 无 per-item effort 默认暴露（`task.enableEffort` 默认 off）：思考档位随 modelRoles 的 thinking 后缀走。
 - benny automations（上游 automations/ 目录，Issue 自动化）未纳入本包：其价值依赖 Cursor Automations 运行时，omp 无 webhook/常驻例程机制。留在上游，未来 omp 出现等价物再评估。
