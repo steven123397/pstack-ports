@@ -1,6 +1,6 @@
 ---
 name: setup-pstack
-description: Configure which models pstack uses per role and at what thinking level. Detects your available models and writes omp modelRoles entries that override the inherit-parent default. Use for /skill:setup-pstack, "configure pstack models", "pstack budget", or changing pstack's model choices.
+description: Configure which models pstack uses per role and at what thinking level, and check the isolation setting its swarm paths need. Detects your available models and writes omp modelRoles entries that override the inherit-parent default. Use for /skill:setup-pstack, "configure pstack models", "pstack budget", "pstack setup", or changing pstack's model choices.
 ---
 
 # Setup pstack
@@ -28,7 +28,27 @@ Run `omp models`. It lists the models usable in this installation and the thinki
 
 Read `~/.omp/agent/config.yml`. Under `modelRoles:`, the current values of `pstack-fast`, `pstack-judge`, and `pstack-panel` are the current choices; a `# pstack budget:` comment line records the last budget. An absent key means inherit-parent. Any other `modelRoles` key is not pstack's — never touch it.
 
-### 3. Budget, map, and confirm
+### 3. Check the isolation setting
+
+pstack's `swarm`, `hillclimb`, `visual-parity`, and `figure-it-out` spawn `isolated: true`. omp exposes that field only when `task.isolation.enabled` is true, and it is off by default, so without it every worker shares the user's checkout.
+
+Read the three settings that decide this:
+
+```bash
+omp config get task.isolation.enabled
+omp config get task.isolation.apply
+omp config get plan.defaultOnStartup
+```
+
+Then report and fix only what the user agrees to:
+
+- `task.isolation.enabled` false. Say those four skills fall back to a shared checkout. Ask whether to enable it.
+- `task.isolation.apply` true. Say every isolated worker's patch lands in the current checkout the moment it finishes, which defeats pstack's verify-then-land order. Ask whether to set it false, so the parent reads the captured patch and applies it deliberately.
+- `plan.defaultOnStartup` true. Fresh sessions open in plan mode, and plan mode rejects the `isolated` field. Say pstack needs plan mode off, and leave the setting alone; the user exits plan mode per session.
+
+On yes, `omp config set task.isolation.enabled true` and `omp config set task.isolation.apply false`. Write nothing else, and never touch a `task.*` key the user did not agree to.
+
+### 4. Budget, map, and confirm
 
 **(a) Ask for a budget.** Use the ask tool, not free text. Offer these four options with these exact labels, and name the current budget when the config records one. With no recorded budget, say that `large` is the recommendation for panels and long runs.
 
@@ -41,13 +61,13 @@ Read `~/.omp/agent/config.yml`. Under `modelRoles:`, the current values of `psta
 
 **(c) Show the roles and confirm.** Show every role from the contract table with its value, marking any real selector not in the detected set as needing a choice. Ask whether to accept as-is or change specific roles, offering the detected models, the `@smol`/`@default`/`@slow` aliases, and inherit-parent as the options. Use the ask tool. Remind the user that `@pstack-panel` should differ in family from `@pstack-fast`.
 
-### 4. Validate
+### 5. Validate
 
-Every real selector must appear in the `omp models` output, with a thinking level that model supports (after the step 3b downgrade). Aliases and inherit-parent always pass. If a chosen selector fails, stop and ask again.
+Every real selector must appear in the `omp models` output, with a thinking level that model supports (after the step 4b downgrade). Aliases and inherit-parent always pass. If a chosen selector fails, stop and ask again.
 
-### 5. Write the config
+### 6. Write the config
 
-Edit `~/.omp/agent/config.yml`. Under `modelRoles:`, set exactly the three pstack keys, preceded by one comment line recording the budget. Remove a key whose value is inherit-parent. Leave every other line of the file byte-for-byte untouched. Shape:
+Edit `~/.omp/agent/config.yml`. Under `modelRoles:`, set exactly the three pstack keys, preceded by one comment line recording the budget. Remove a key whose value is inherit-parent. Leave every other line of the file byte-for-byte untouched, apart from the `task.isolation` keys step 3 changed with the user's consent. Shape:
 
 ```yaml
 modelRoles:
@@ -59,14 +79,14 @@ modelRoles:
 
 Re-runs stay idempotent: same inputs, same three lines. Routing changes to `modelRoles` apply to subsequent subagent launches without restarting omp; already-running agents keep their model.
 
-### 6. Confirm, and name the escape hatches
+### 7. Confirm, and name the escape hatches
 
 Tell the user the config was written and which roles now differ from inherit-parent. Then, once, name the two built-in ways to deviate without re-running this skill: `task.agentModelOverrides` overrides a named agent's model directly, and tagging a model with `^` in the composer mints an `m1`/`m2` agent for ad-hoc spawns. Per-project pstack roles are possible via `modelRoleStorage: project`, which writes role assignments to the project's `.omp/config.yml` instead.
 
-### 7. Offer a verification skill (optional)
+### 8. Offer a verification skill (optional)
 
 Check whether the project has a way to drive the real app for proof (a `verify-*` skill, or an existing harness). If not, offer once: "want a project-local verification skill, so agents can drive the app the way a user does and prove changes work? I can generate one with /skill:create-verification-skill." On yes, invoke `/skill:create-verification-skill`. On no, move on without pushing.
 
-### 8. Offer a formal verification skill (optional)
+### 9. Offer a formal verification skill (optional)
 
 Check whether the project already has a formal verification skill (a project skill that runs a model checker, a proof, or another verifier against the code). If not, offer once: "want a formal verification skill, so agents can prove a key property of your code holds in every case in scope, not only the cases tests reach? I can generate one with /skill:create-formal-verification-skill." On yes, invoke `/skill:create-formal-verification-skill`. On no, move on without pushing.

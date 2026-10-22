@@ -108,7 +108,7 @@ omp plugin install pstack-omp@pstack-ports
 ## 已知限制
 
 - 模型多样性依赖用户配置：三个 `@pstack-*` 角色未配置时全继承父模型，arena/interrogate 的"跨家族面板"退化为同模型多席位。setup-pstack 引导配置时解决。
-- `isolated: true` 要求 `task.isolation.enabled: true`（omp 默认 off），skills 降级为共享 checkout + 注明。
+- `isolated: true` 要求 `task.isolation.enabled: true`（omp 默认 off），未开启时 swarm/hillclimb/visual-parity/figure-it-out 降级为共享 checkout；setup-pstack 第 3 步检测并征得同意后开启，同时建议 `task.isolation.apply: false`，避免隔离 worker 的补丁自动落进当前 checkout。
 - Jules 云 worker 依赖 `JULES_API_KEY` 和已授权的 GitHub 仓库；API 无 cancel 端点，只读 session 答完后可能长期停在 `IN_PROGRESS`，要用 `result` 读答案而不是等 `COMPLETED`。
 - Qoder Cloud Agents MCP 未作为默认路径：它是通用沙箱，需 setup script 自行 clone，且不自动产出 PR。
 - Bugbot 环节跳过：omp 没有自动 PR 评审。人类或其他 bot 留下的 review thread 仍按 `review-triage.md` 分诊，未解决线程仍会阻塞 `watch-pr` 的 `READY`；只是不再等待或配置 Bugbot。

@@ -71,6 +71,18 @@ Rules for every spawn:
 - `task.enableEffort` (default off) gates the per-item `effort: lo|med|hi` field. When a skill wants a reasoning tier for one spawn, prefer the role's `modelRoles` value over relying on `effort`.
 - A `modelRoles` value may itself alias a built-in chat role, e.g. `pstack-judge: "@slow"`. Skills still name only the `pstack-*` roles; pointing them at `@smol`/`@default`/`@slow` is a config-time shortcut setup-pstack may offer, never a skill-side hardcode.
 
+## Settings
+
+pstack depends on three settings beyond `modelRoles`. `/skill:setup-pstack` checks them and writes only what the user approves.
+
+| key | default | what pstack needs |
+| --- | --- | --- |
+| `task.isolation.enabled` | `false` | `true`. The `isolated` field exists only when this is on, and `swarm`, `hillclimb`, `visual-parity`, and `figure-it-out` spawn `isolated: true`. Isolated spawns need a git repo. |
+| `task.isolation.apply` | `true` | `false`. With `true`, every isolated worker's patch lands in the current checkout the moment it finishes, which defies pstack's verify-then-land order. With `false`, the patch is captured as `<Agent>.patch` in the session artifacts dir, or under `%TEMP%\omp-task-<id>\` when the session has none, and the parent applies it deliberately. |
+| `plan.defaultOnStartup` | `false` | `false`, or the user exits plan mode first. Plan mode rejects the `isolated` field and eval tools. `plan.enabled` only makes plan mode available; it does not put a session in it. |
+
+`task.enableEffort` stays off. pstack rides thinking levels on the `modelRoles` values instead of per-item `effort`.
+
 ## setup-pstack
 
 Follow the skill's steps with these changes:
