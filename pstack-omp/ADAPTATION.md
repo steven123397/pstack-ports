@@ -35,7 +35,7 @@
 | `subagent_type` | `agent`（agent 名，指向 agents/*.md 定义或 bundled） |
 | `model`（per-item） | **不存在**。模型路由下沉到 agent frontmatter `model: "@role"` + `modelRoles` 设置 |
 | `readonly: true` | 只读 agent（tools 限制在 frontmatter）或 bundled `scout` |
-| `environment: "cloud"` | `isolated: true`（需 `task.isolation.enabled`，workspace 是 repo 副本，补丁捕获） |
+| `environment: "cloud"` | Jules cloud session（`poteto-mode/scripts/jules-cloud.mjs`，REST API，`AUTO_CREATE_PR`）；需机器本地保留时才用 `isolated: true` |
 | `run_in_background` | 不需要：`async.enabled` 默认开，一切后台化 |
 | `resume` | `write agent://<id>`（活/驻留 agent 消息即复活） |
 | （无） | `solutionSpace` **必填**：子问题开放度描述，喂给思考分级器 |
@@ -56,7 +56,7 @@
 
 ### Cursor-only 能力 → 跳过策略
 
-omp 无对应物的（Automations/Bugbot/cloud agents/`/loop`）：skill 步骤保留，执行时输出一行 `Skipped in omp: <step>. <reason>.` 继续走，不询问不重试。有 omp 替代物的不是 skip：`deslop`→unslop skill、`control-ui`→browser 工具、`control-cli`→bash 实跑、内置 PR 工具→`gh`/`pr://`、`create-skill`→authoring-a-skill playbook。
+omp 无对应物的（Automations/Bugbot）：skill 步骤保留，执行时输出一行 `Skipped in omp: <step>. <reason>.` 继续走，不询问不重试。有 omp 替代物的不是 skip：`cloud agents`→Jules REST API（`jules-cloud.mjs`）、`/loop`→omp 内置 `/loop`、`deslop`→unslop skill、`control-ui`→browser 工具、`control-cli`→bash 实跑、内置 PR 工具→`gh`/`pr://`、`create-skill`→authoring-a-skill playbook。
 
 ### frontmatter 兼容性
 
@@ -81,11 +81,17 @@ omp 无对应物的（Automations/Bugbot/cloud agents/`/loop`）：skill 步骤�
 
 ## 验证
 
-（占位，待集成阶段填写实测结果）
+- **安装/冒烟**：`omp plugin link` 后 59 个 skill、16 个 playbook、5 个 agent 可发现；禁词扫描清空（云/Bugbot 段落除外）。
+- **worktree 审计**：临时 git 仓库 + worktree + 伪造 session JSONL，`LAST_CHAT` 输出了正确日期，bucket 从 `safe` 变为 `verify-recent-chat`；当前仓库解析到 `~/.omp/agent/sessions/--D--codex_project-pstack-ports--`。
+- **Jules CLI 试跑**：session 可创建、可并行、可 `remote pull` 出 patch；但 `--session` 会在 `#` 截断，只读任务取不到文字结论，PR 不自动创建。
+- **Jules API 试跑**：`AUTO_CREATE_PR` 在约 4 分 09 秒内产出 PR，`outputs[].pullRequest` 直接给 URL，`activities` 可读计划、进度和 agent 消息；关闭 PR/删分支后 session 可能回到 `IN_PROGRESS`，`wait` 以超时退出。
+- **适配器冒烟**：`sources`、`dispatch --no-pr`、`status`、`wait`（超时路径）、`send`、`result`、`activities` 均对真实 Jules API 跑通；只读 session 的 `result` 返回 `SEND_OK`。
 
 ## 已知限制
 
 - 模型多样性依赖用户配置：三个 `@pstack-*` 角色未配置时全继承父模型，arena/interrogate 的"跨家族面板"退化为同模型多席位。setup-pstack 引导配置时解决。
 - `isolated: true` 要求 `task.isolation.enabled: true`（omp 默认 off），skills 降级为共享 checkout + 注明。
+- Jules 云 worker 依赖 `JULES_API_KEY` 和已授权的 GitHub 仓库；API 无 cancel 端点，只读 session 答完后可能长期停在 `IN_PROGRESS`，要用 `result` 读答案而不是等 `COMPLETED`。
+- Qoder Cloud Agents MCP 未作为默认路径：它是通用沙箱，需 setup script 自行 clone，且不自动产出 PR。
 - omp 无 per-item effort 默认暴露（`task.enableEffort` 默认 off）：思考档位随 modelRoles 的 thinking 后缀走。
 - benny automations（上游 automations/ 目录，Issue 自动化）未纳入本包：其价值依赖 Cursor Automations 运行时，omp 无 webhook/常驻例程机制。留在上游，未来 omp 出现等价物再评估。

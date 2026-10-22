@@ -27,14 +27,26 @@ omp's `task` schema is `{ context, tasks: [{ name?, agent?, task, solutionSpace,
 | A model slug in `model` (e.g. `claude-opus-5-5-xhigh`, `grok-4.7-xhigh-fast`) | Omit it. omp routes models per *agent type* and per *role*, not per task item. See Models below. |
 | `readonly: true` | Use a read-only agent: bundled `scout` (read-only by tool set) or this plugin's `pstack-reader`/`pstack-judge` agents whose frontmatter restricts tools to read-only ones. Do not strip `bash` if the brief needs real commands; then keep the agent read-only *by instruction* ("do not edit files") and check `git status` afterwards. |
 | `readonly: false`, agent mode with MCP | omit `agent`. The default `task` agent keeps the session's MCP tools. |
-| `environment: "cloud"` | `isolated: true` in the task item — requires the omp setting `task.isolation.enabled: true`; when off, run in the shared checkout instead and note it. The isolation workspace is a copy of the repo, so worker output that must persist goes in the brief: have the worker write its artifact under a path you merge, or report it in its result. |
+| `environment: "cloud"` | A Jules cloud session dispatched through `poteto-mode/scripts/jules-cloud.mjs` (see Cloud workers). It works on a connected GitHub repository and opens its own PR, so it survives this machine. For work that must stay local, `isolated: true` copies the repo in a local workspace instead and dies with the machine. |
 | `environment: "local"` | Omit. Workers share the parent checkout by default. |
-| `cloud_base_branch: <b>` | Name `<b>` in the brief; the worker checks it out first (only meaningful with `isolated: true`). |
+| `cloud_base_branch: <b>` | Dispatch with `jules-cloud.mjs dispatch --branch <b>`; a local `isolated: true` worker checks out `<b>` first. |
 | `run_in_background: true` | Omit. With `async.enabled` (default true) every task spawn runs in the background and delivers results automatically. |
 | `run_in_background: false` | Not expressible per item. Accept background delivery; `wait` blocks until a job you started settles. |
 | `resume` | `write agent://<id>` messages the live or parked agent; `--restore` resumes an interrupted session. Prefer a fresh subagent with consolidated scope per poteto-mode's Subagents section, and use messaging only when state truly lives in that agent. |
 | `file_attachments` | List the paths in the brief. |
 | (none) | `solutionSpace` is required: describe how open-ended the child's problem is, one line. |
+
+## Cloud workers
+
+omp's `task` is local. A worker that must outlive this machine is a **Jules cloud session**, dispatched through `poteto-mode/scripts/jules-cloud.mjs`. The script is the only place pstack names the provider; skills call it.
+
+- **Prerequisites.** `JULES_API_KEY` in the environment, and the repository must be connected to Jules. Verify with `jules-cloud.mjs sources`; connect a missing repo in the Jules web app first. Set it in the environment, not as a script argument, and never write it into the repo.
+- **Dispatch.** `node jules-cloud.mjs dispatch --repo <owner/name> --brief <file> [--branch main] [--title <text>] [--no-pr]`. Put the brief in a file or stdin. Do not pass a long prompt through the Jules CLI's `--session`: it truncates at `#`.
+- **Observe.** `status --session <id>` or `wait --session <id> [--timeout 3600] [--require-pr]`. Poll `state` and `outputs[].pullRequest` together: the PR can appear while the session is still `IN_PROGRESS`. Terminal states are `COMPLETED` and `FAILED`; `AWAITING_PLAN_APPROVAL` and `AWAITING_USER_FEEDBACK` need a human and exit non-zero. A timeout is not success. A read-only session can stay `IN_PROGRESS` after it has answered: read `activities --session <id>` for the `agentMessaged` text and stop waiting.
+- **Follow up.** `send --session <id> --brief <file>` posts another turn to the same cloud session, for a fix round, a merge order, or an answer to `AWAITING_USER_FEEDBACK`. The session keeps its branch and context.
+- **Deliverable.** The PR URL and its head branch. The cloud worker is the only writer on that branch. Use `activities --session <id>` to read the plan and progress. Read-only cloud workers produce no PR: dispatch with `--no-pr`, read the answer with `result --session <id>`, and do not wait for `COMPLETED`.
+- **No cancel.** The API documents no cancel endpoint. Abandon a session by ignoring it and deleting any branch or PR it produced.
+- **Qoder Cloud Agents MCP is not the default.** It is a generic cloud sandbox: a repository is cloned by an Environment setup script and no PR is produced. Use it only for work that needs custom tools, environments, or scheduled deployments, not for pstack's owner/verifier PR workflow.
 
 ## Models
 
@@ -74,22 +86,22 @@ Follow the skill's steps with these changes:
 | --- | --- |
 | `.cursor/skills/`, `~/.cursor/skills/` | this plugin is installed via `omp plugin link <pstack>` or marketplace; skills live under its `skills/`. For project-local skills: `.omp/skills/<name>/SKILL.md`; user: `~/.omp/agent/skills/<name>/SKILL.md`. |
 | `~/.cursor/rules/pstack-models.mdc` | `modelRoles` in `~/.omp/agent/config.yml` (see Models). |
-| `~/.cursor/projects/<slug>/agent-transcripts/<uuid>/<uuid>.jsonl` | `~/.omp/agent/sessions/<encoded-cwd>/<timestamp>_<sessionId>.jsonl`. `<encoded-cwd>` is derived from the canonical cwd: `-<relative>` under the home directory, `-tmp-<relative>` under the temp root, `--<encoded-absolute>--` otherwise, path separators as `-`. `D:/codex_project/upstreams/pstack` becomes `--D--codex_project-upstreams-pstack--`. Every line is one session entry; the newest `.jsonl` directly in that folder is the most recent session. Subagent transcripts are `<id>.jsonl` files in the session's artifacts tree, read via `history://<id>`. Read only the current workspace's bucket. |
+| `~/.cursor/projects/<slug>/agent-transcripts/<uuid>/<uuid>.jsonl` | `~/.omp/agent/sessions/<encoded-cwd>/<timestamp>_<sessionId>.jsonl`. `<encoded-cwd>` is derived from the canonical cwd: `-<relative>` under the home directory, `-tmp-<relative>` under the temp root, `--<encoded-absolute>--` otherwise, path separators as `-`. `D:/codex_project/upstreams/pstack` becomes `--D--codex_project-upstreams-pstack--`. Every line is one session entry; the newest `.jsonl` directly in that folder is the most recent session. Subagent transcripts are `<AgentName>.jsonl` files in the session's artifacts tree, read via `history://<id>`. Read only the current workspace's bucket. |
 | `https://github.com/cursor/plugins/blob/main/pstack/<path>` | `<pstack>/<path>` in this plugin. Read the local copy, never fetch it. Give the user the URL when they need a link. |
 | `/tmp/arena-<slug>/candidate-<n>/` | `$TMPDIR` or `%TEMP%` path with the same shape; or a git worktree when one is available. |
 | `.cursor/worktrees/` | `task` isolation workspaces (branch mode `omp/task/<id>`) or plain `git worktree` commands. |
 
 ## Cursor-only features
 
-omp has no Cursor Automations, no Bugbot, no Cursor cloud agents, and no `/loop`. When a step needs one, put one line in your reply, `Skipped in omp: <step>. <reason>.`, then go on to the next step. Do not stop, ask, or retry. When a later step needs what the skipped step made, such as a URL or a key, leave a placeholder and name it in the line.
+omp has no native Cursor Automations or Bugbot. Cursor cloud agents are replaced by the Jules adapter above. When a step needs a feature with no replacement, put one line in your reply, `Skipped in omp: <step>. <reason>.`, then go on to the next step. Do not stop, ask, or retry. When a later step needs what the skipped step made, such as a URL or a key, leave a placeholder and name it in the line.
 
 | Cursor | omp |
 | --- | --- |
 | Cursor Automations: routines, webhooks, routine wakes, `SendToUser` secret requests | Skip with the line. |
 | Bugbot | GitHub PR review comments are ordinary review threads; triage them with `gh` or the `issue://`/`pr://` internal URLs. Skip a step that starts, waits for, or configures Bugbot when the PR has no such check or comment. |
-| Cursor cloud agents | `environment: "cloud"` maps to `isolated: true` as in Subagent fields. Skip a step that needs the cloud agent itself. |
+| Cursor cloud agents | Dispatch a Jules session with `poteto-mode/scripts/jules-cloud.mjs` as in Cloud workers. Not a skip. Skip only a step that needs the Cursor dashboard or that agent's VM identity. |
 | A built-in PR tool | `gh pr create`, or `pr://` internal URLs for reading. Not a skip. |
-| `/loop` | omp equivalent is an autonomous-run prompt ("run until done", goal mode) inside one session; say so and continue. |
+| `/loop` | omp has it built in: `/loop [count\|duration] [--while\|--until <check>]`. Not a skip. |
 | Cursor's built-in `create-skill` | This plugin's own authoring flow: `poteto-mode`'s authoring-a-skill playbook plus omp's `manage_skill` tool / `xd://manage_skill`. Not a skip. |
 | `cursor-team-kit` `deslop`, `control-cli`, `control-ui` | `deslop` → the **unslop** skill. CLI/TUI verification → omp `bash` (launch the program, observe). Browser/web UI verification → omp `browser` (`browser.open` tab, `tab.run` JS, visual proof). Not a skip. |
 
