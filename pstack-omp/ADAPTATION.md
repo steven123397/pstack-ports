@@ -81,11 +81,29 @@ omp 无对应物的（Automations/Bugbot）：skill 步骤保留，执行时输�
 
 ## 验证
 
-- **安装/冒烟**：`omp plugin link` 后 59 个 skill、16 个 playbook、5 个 agent 可发现；禁词扫描清空（云/Bugbot 段落除外）。
+- **安装/冒烟**：`omp plugin link` 后 56 个 skill 目录、23 个 playbook、5 个 agent 可发现；`skill://poteto-mode/references/review-triage.md` 正常解析，`pstack-{worker,judge,panel,reader}` 四个 agent 出现在 task 工具描述里，三角色分别解析到 deepseek-1017 / kimi-k3 / glm-5.3。
+- **禁词扫描**：机制词已清空；剩余 `bugbot` 仅出现在 `watch-pr` 的 GitHub 作者识别代码与测试（判定评审线程来源，属功能而非适配），云/Bugbot 段落的说明性提及保留。
 - **worktree 审计**：临时 git 仓库 + worktree + 伪造 session JSONL，`LAST_CHAT` 输出了正确日期，bucket 从 `safe` 变为 `verify-recent-chat`；当前仓库解析到 `~/.omp/agent/sessions/--D--codex_project-pstack-ports--`。
 - **Jules CLI 试跑**：session 可创建、可并行、可 `remote pull` 出 patch；但 `--session` 会在 `#` 截断，只读任务取不到文字结论，PR 不自动创建。
 - **Jules API 试跑**：`AUTO_CREATE_PR` 在约 4 分 09 秒内产出 PR，`outputs[].pullRequest` 直接给 URL，`activities` 可读计划、进度和 agent 消息；关闭 PR/删分支后 session 可能回到 `IN_PROGRESS`，`wait` 以超时退出。
 - **适配器冒烟**：`sources`、`dispatch --no-pr`、`status`、`wait`（超时路径）、`send`、`result`、`activities` 均对真实 Jules API 跑通；只读 session 的 `result` 返回 `SEND_OK`。
+
+## 分发
+
+仓库根的 `.omp-plugin/marketplace.json` 是 marketplace catalog，名字 `pstack-ports`，条目 `source: "./pstack-omp"`（catalog 支持子目录，所以不必把包拆成独立仓库）。
+
+消费者两条命令：
+
+```
+omp plugin marketplace add <owner>/pstack-ports
+omp plugin install pstack-omp@pstack-ports
+```
+
+本地开发仍用 `omp plugin link ./pstack-omp`，改完即生效。两条路径都只依赖 `package.json` 的 `omp` manifest。
+
+**不要给包加 root `plugin.json`**：一旦存在，skill 发现会让位给 `agent-plugins` 提供者的 Agent Skills 1.0.0 封闭字段校验，`disable-model-invocation`（以及同义的 `hide`、`disableModelInvocation`）不在字段集内，55 个 skill 被静默丢弃，而 `omp plugin doctor` 仍报全绿。实测：同一包无 `plugin.json` 时四个字段变体全部载入，有它时只剩不带字段的那个。git 直装（`omp plugin install github:…`) 要求仓库根有 `package.json`，本 monorepo 不满足，所以分发走 marketplace。
+
+`pstack-zh` 是中文自读版，没有 `package.json`，暂不作为插件分发。
 
 ## 已知限制
 

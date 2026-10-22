@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "pstack-ports",
+  "owner": {
+    "name": "Steven Liang",
+    "email": "2961735737@qq.com"
+  },
+  "metadata": {
+    "description": "pstack ports: upstream Cursor workflows adapted to other harnesses",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "pstack-omp",
+      "description": "pstack adapted for omp. if you want to go fast, go deep first. rigorous agent workflows you can parallelize with confidence.",
+      "source": "./pstack-omp",
+      "category": "development",
+      "homepage": "https://github.com/cursor/plugins/tree/main/pstack"
+    }
+  ]
+}

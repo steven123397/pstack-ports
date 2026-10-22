@@ -1,0 +1,6 @@
+# Shell scripts and Node entrypoints must keep LF: Windows checkouts are read
+# from WSL via /mnt/, where a CRLF interpreter line breaks bash outright.
+*.sh   text eol=lf
+*.bash text eol=lf
+*.mjs  text eol=lf
+*.ts   text eol=lf
