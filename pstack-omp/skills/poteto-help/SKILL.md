@@ -24,7 +24,7 @@ Infer the need from the message and the conversation. A named situation, such as
 
 Check the state that changes the answer, and mention it only when it does:
 
-- No `pstack-fast`, `pstack-judge`, or `pstack-panel` key under `modelRoles` in `~/.omp/agent/config.yml` means `/skill:setup-pstack` hasn't run for this user, so every role inherits the parent session model.
+- No `pstack-fast`, `pstack-judge`, or `pstack-panel` key under `modelRoles` in `~/.omp/agent/config.yml` and no `# pstack budget:` comment line there means `/skill:setup-pstack` hasn't run for this user, so every role inherits the parent session model. The same three keys in a project `.omp/config.yml` count as configured, because `modelRoleStorage: project` writes them there.
 - No `verify-*` skill or other app harness in the project means agents have no scripted way to drive the app. Mention `/skill:create-verification-skill` when the question is about proving a change works.
 - No formal verification skill in the project means no property is checked past what tests reach. Mention `/skill:create-formal-verification-skill` when the question is about a race, an invariant, or another case tests rarely hit. When one exists and the code it covers changed after the commit it records as last in sync, mention `/skill:maintain-formal-verification-skill` if the question touches that code.
 

@@ -1,6 +1,6 @@
 # pstack → omp 适配记录
 
-把 Cursor 插件 pstack（55 skills + 2 agents + 24 playbooks）改造成 omp 可用的 Agent Plugins 标准插件包。本文记录映射决策与可复用经验，供未来适配其他 agent 平台参考。
+把 Cursor 插件 pstack（56 skills + 2 agents + 23 playbooks）改造成 omp 可用的 Agent Plugins 标准插件包。本文记录映射决策与可复用经验，供未来适配其他 agent 平台参考。
 
 - 上游：`https://github.com/cursor/plugins`，pstack v0.15.29（commit 88d4751）
 - 产物：`pstack-omp/`（本目录），Agent Plugins 1.0.0 标准包

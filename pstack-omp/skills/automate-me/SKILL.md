@@ -95,7 +95,7 @@ Work in a worktree off main. Commit and open a PR. Don't push to main directly.
 
 A `-mode` skill is subjective output. A test/iterate benchmark loop isn't useful here. Vibe-check with the user: does it read like them? Did it miss anything? Then ship.
 
-Run a description-optimization loop only if the skill's trigger accuracy turns out to be a problem in practice.
+If the skill's trigger accuracy turns out to be a problem in practice, rewrite its `description` under the **authoring-a-skill** playbook's rules and test the trigger phrases against real prompts.
 
 ## When not to use
 

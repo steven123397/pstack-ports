@@ -25,13 +25,13 @@ omp's `task` schema is `{ context, tasks: [{ name?, agent?, task, solutionSpace,
 | `subagent_type: poteto-agent` | `agent: "pstack-worker"` (defined in this plugin's `agents/`). |
 | `subagent_type: comment-sicko` | `agent: "comment-sicko"` (defined in this plugin's `agents/`). |
 | A model slug in `model` (e.g. `claude-opus-5-5-xhigh`, `grok-4.7-xhigh-fast`) | Omit it. omp routes models per *agent type* and per *role*, not per task item. See Models below. |
-| `readonly: true` | Use a read-only agent: bundled `scout` (read-only by tool set) or this plugin's `pstack-reader`/`pstack-judge` agents whose frontmatter restricts tools to read-only ones. Do not strip `bash` if the brief needs real commands; then keep the agent read-only *by instruction* ("do not edit files") and check `git status` afterwards. |
+| `readonly: true` | Use a read-only agent: bundled `scout` (read-only by tool set) or this plugin's `pstack-reader`, whose frontmatter lists only `read, grep, glob, web_search`. `pstack-judge` carries no `tools` restriction because the same agent also writes the hardest code changes, so a judge review seat is read-only *by instruction*: put "do not edit files" in the brief and check `git status` afterwards. Do not strip `bash` when the brief needs real commands; keep that agent read-only by instruction too. |
 | `readonly: false`, agent mode with MCP | omit `agent`. The default `task` agent keeps the session's MCP tools. |
 | `environment: "cloud"` | A Jules cloud session dispatched through `poteto-mode/scripts/jules-cloud.mjs` (see Cloud workers). It works on a connected GitHub repository and opens its own PR, so it survives this machine. For work that must stay local, `isolated: true` copies the repo in a local workspace instead and dies with the machine. |
 | `environment: "local"` | Omit. Workers share the parent checkout by default. |
 | `cloud_base_branch: <b>` | Dispatch with `jules-cloud.mjs dispatch --branch <b>`; a local `isolated: true` worker checks out `<b>` first. |
 | `run_in_background: true` | Omit. With `async.enabled` (default true) every task spawn runs in the background and delivers results automatically. |
-| `run_in_background: false` | Not expressible per item. Accept background delivery; `wait` blocks until a job you started settles. |
+| `run_in_background: false` | Per item only through an agent whose frontmatter sets `blocking: true`; no bundled agent declares it, so in practice accept background delivery. `wait` blocks until a job you started settles. |
 | `resume` | `write agent://<id>` messages the live or parked agent; `--restore` resumes an interrupted session. Prefer a fresh subagent with consolidated scope per poteto-mode's Subagents section, and use messaging only when state truly lives in that agent. |
 | `file_attachments` | List the paths in the brief. |
 | (none) | `solutionSpace` is required: describe how open-ended the child's problem is, one line. |
@@ -87,7 +87,7 @@ Follow the skill's steps with these changes:
 | `.cursor/skills/`, `~/.cursor/skills/` | this plugin is installed via `omp plugin link <pstack>` or marketplace; skills live under its `skills/`. For project-local skills: `.omp/skills/<name>/SKILL.md`; user: `~/.omp/agent/skills/<name>/SKILL.md`. |
 | `~/.cursor/rules/pstack-models.mdc` | `modelRoles` in `~/.omp/agent/config.yml` (see Models). |
 | `~/.cursor/projects/<slug>/agent-transcripts/<uuid>/<uuid>.jsonl` | `~/.omp/agent/sessions/<encoded-cwd>/<timestamp>_<sessionId>.jsonl`. `<encoded-cwd>` is derived from the canonical cwd: `-<relative>` under the home directory, `-tmp-<relative>` under the temp root, `--<encoded-absolute>--` otherwise, path separators as `-`. `D:/codex_project/upstreams/pstack` becomes `--D--codex_project-upstreams-pstack--`. Every line is one session entry; the newest `.jsonl` directly in that folder is the most recent session. Subagent transcripts are `<AgentName>.jsonl` files in the session's artifacts tree, read via `history://<id>`. Read only the current workspace's bucket. |
-| `https://github.com/cursor/plugins/blob/main/pstack/<path>` | `<pstack>/<path>` in this plugin. Read the local copy, never fetch it. Give the user the URL when they need a link. |
+| `https://github.com/cursor/plugins/blob/main/pstack/<path>` | `<pstack>/<path>` in this plugin for everything the plugin ships. `README.md`, `docs/guide/`, and `docs/harness/claude-code.md` are not shipped: cite them as upstream references and never treat them as this plugin's omp behavior. Read the local copy, never fetch it. Give the user the URL when they need a link. |
 | `/tmp/arena-<slug>/candidate-<n>/` | `$TMPDIR` or `%TEMP%` path with the same shape; or a git worktree when one is available. |
 | `.cursor/worktrees/` | `task` isolation workspaces (branch mode `omp/task/<id>`) or plain `git worktree` commands. |
 
@@ -102,6 +102,7 @@ omp has no native Cursor Automations or Bugbot. Cursor cloud agents are replaced
 | Cursor cloud agents | Dispatch a Jules session with `poteto-mode/scripts/jules-cloud.mjs` as in Cloud workers. Not a skip. Skip only a step that needs the Cursor dashboard or that agent's VM identity. |
 | A built-in PR tool | `gh pr create`, or `pr://` internal URLs for reading. Not a skip. |
 | `/loop` | omp has it built in: `/loop [count\|duration] [--while\|--until <check>]`. Not a skip. |
+| `/visualize` | No command. `tui.autoGraph` charts a numeric Markdown table under the message, so numbers to compare go in a table. A table is not a picture; screenshots, Mermaid, and generated images still carry visual claims. |
 | Cursor's built-in `create-skill` | This plugin's own authoring flow: `poteto-mode`'s authoring-a-skill playbook plus omp's `manage_skill` tool / `xd://manage_skill`. Not a skip. |
 | `cursor-team-kit` `deslop`, `control-cli`, `control-ui` | `deslop` → the **unslop** skill. CLI/TUI verification → omp `bash` (launch the program, observe). Browser/web UI verification → omp `browser` (`browser.open` tab, `tab.run` JS, visual proof). Not a skip. |
 

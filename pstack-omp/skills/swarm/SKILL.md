@@ -24,7 +24,7 @@ Open a todolist with one entry per phase before launching anything.
 
 ## Phase B: Fan out
 
-Spawn all N workers in one `task` call with the step 4 agent and `isolated: true` on each item, omp's local equivalent of a cloud environment. Isolation requires `task.isolation.enabled`, and ignored files such as `node_modules` do not carry over, so a worker that runs tests must install dependencies first. Omit `isolated` when the worker needs the shared checkout or something else on this machine.
+Spawn all N workers in one `task` call with the step 4 agent and `isolated: true` on each item. Isolation requires `task.isolation.enabled`, and ignored files such as `node_modules` do not carry over, so a worker that runs tests must install dependencies first. When that setting is off, give each worker its own branch or worktree and name it in the brief, so no two workers write the same checkout. Fan-out that must outlive this machine runs as Jules sessions instead, per the Cloud workers section of the plugin's `docs/harness/omp.md`. Omit isolation only when the worker needs the shared checkout or something else on this machine, and say so in the brief.
 
 When a worker must start from a non-default pushed branch, name that branch in the brief so the worker checks it out first.
 
