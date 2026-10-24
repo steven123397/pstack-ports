@@ -1,6 +1,9 @@
-> **注意:本目录是 pstack 的 Kimi Code 移植版,适配进行中,暂不可安装使用。**
+> **注意:本目录是 pstack 的 Kimi Code 移植版,适配已暂停,暂不可安装使用。**
 > 上游原文:<https://github.com/cursor/plugins/tree/main/pstack>(v0.15.29,commit 88d4751)。
-> 移植方法与进度见仓库根 `PORTING-GUIDE.md` 与本目录 `docs/harness/kimicode.md`。
+> 暂停于 2026-10-24:Kimi Code 适配不再在本仓库环境继续,恢复时从下面的进度点接着做。
+> 已完成:`kimi.plugin.json`、`docs/harness/kimicode.md`(五张映射表)、Jules 云 worker 适配、`setup-pstack`(改写为池提示语配置器)、`poteto-mode/SKILL.md` 主体、`agents/` 两个角色。
+> 未完成:约 23 个 skill 文件仍带 Cursor 专属机制(`automate-me`、`reflect`、`arena`、`interrogate`、`swarm`、`create-verification-skill` 等),另有个别 playbook 的零散引用。`docs/harness/kimicode.md`、本 README 与 `automations/benny/` 里的 Cursor 词是刻意保留的,不算残留。
+> 移植方法与流程见仓库根 `PORTING-GUIDE.md`;恢复时从第 3 步(机械改写)继续。
 > 以下内容为上游原文,尚未改写的部分仍以 Cursor 机制为准,请勿在 Kimi Code 中直接照用。
 
 # pstack

@@ -4,6 +4,17 @@
 
 产物本身在 [`pstack-omp/`](pstack-omp/)，包级决策记录在 [`pstack-omp/ADAPTATION.md`](pstack-omp/ADAPTATION.md)。本文只讲可移植的方法。
 
+## 产物状态
+
+| 目录 | 目标平台 | 状态 | 记录 |
+| --- | --- | --- | --- |
+| [`pstack-omp/`](pstack-omp/) | omp | 完成，可经 marketplace 分发 | [`ADAPTATION.md`](pstack-omp/ADAPTATION.md) |
+| [`pstack-zh/`](pstack-zh/) | 阅读用中文版 | 完成，不作为插件分发 | [`README.md`](pstack-zh/README.md) |
+| [`pstack-kimi/`](pstack-kimi/) | Kimi Code | **暂停**（2026-10-24），不可安装 | [`README.md`](pstack-kimi/README.md) 首段、[`docs/harness/kimicode.md`](pstack-kimi/docs/harness/kimicode.md) |
+| [`pstack-dsh/`](pstack-dsh/) | DeepSeek Harness | **进行中**，当前只有骨架 | [`README.md`](pstack-dsh/README.md) |
+
+状态只记最后确认过的结论；恢复某个 port 时，先按本文第 5 步重跑一遍三个脚本，再信这里的描述。
+
 ## 三种移植姿态，以及为什么选编译期改写
 
 上游 pstack 自带的 `docs/harness/claude-code.md` 采用运行时映射表。skill 正文保留 Cursor 写法，模型执行时查表翻译。移植到 omp 时没有沿用，改成了编译期改写，正文直接写目标平台的机制。
