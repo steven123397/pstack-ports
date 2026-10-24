@@ -1,3 +1,8 @@
+> **注意:本目录是 pstack 的 Kimi Code 移植版,适配进行中,暂不可安装使用。**
+> 上游原文:<https://github.com/cursor/plugins/tree/main/pstack>(v0.15.29,commit 88d4751)。
+> 移植方法与进度见仓库根 `PORTING-GUIDE.md` 与本目录 `docs/harness/kimicode.md`。
+> 以下内容为上游原文,尚未改写的部分仍以 Cursor 机制为准,请勿在 Kimi Code 中直接照用。
+
 # pstack
 
 i'm [poteto](https://x.com/poteto). i'm not a president or ceo, but i've worked with millions of lines of code at Meta, Netflix, and Cursor. i'm also on the react core team where i help build and maintain react compiler.
