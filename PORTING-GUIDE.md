@@ -6,14 +6,7 @@
 
 ## 产物状态
 
-| 目录 | 目标平台 | 状态 | 记录 |
-| --- | --- | --- | --- |
-| [`pstack-omp/`](pstack-omp/) | omp | 完成，可经 marketplace 分发 | [`ADAPTATION.md`](pstack-omp/ADAPTATION.md) |
-| [`pstack-zh/`](pstack-zh/) | 阅读用中文版 | 完成，不作为插件分发 | [`README.md`](pstack-zh/README.md) |
-| [`pstack-kimi/`](pstack-kimi/) | Kimi Code | **暂停**（2026-10-24），不可安装 | [`README.md`](pstack-kimi/README.md) 首段、[`docs/harness/kimicode.md`](pstack-kimi/docs/harness/kimicode.md) |
-| [`pstack-dsh/`](pstack-dsh/) | DeepSeek Harness | **进行中**，当前只有骨架 | [`README.md`](pstack-dsh/README.md) |
-
-状态只记最后确认过的结论；恢复某个 port 时，先按本文第 5 步重跑一遍三个脚本，再信这里的描述。
+状态、最后确认时间与验证方式统一记在 [`docs/status.md`](docs/status.md)。本文不复制那张表——复制会漂移。恢复某个 port 时，先按下面第 5 步重跑三个脚本，再信那里的描述。
 
 ## 三种移植姿态，以及为什么选编译期改写
 

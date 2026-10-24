@@ -1,0 +1,23 @@
+{
+  "$comment": "本仓库所有 port 的共同上游基线。升级上游时先改这里，再逐 port 重跑 tools/fidelity；不要在各 port 的文档里另写版本号。",
+  "upstream": {
+    "repo": "cursor/plugins",
+    "path": "pstack",
+    "version": "0.15.29",
+    "commit": "88d4751",
+    "commitDate": "2026-10-19",
+    "license": "MIT",
+    "localMirror": "D:/codex_project/upstreams/pstack",
+    "localMirrorCommit": "88d4751"
+  },
+  "counts": {
+    "skills": 56,
+    "playbooks": 23,
+    "principles": 24,
+    "agents": 2
+  },
+  "verify": {
+    "changedLinesBaseline": "739 / 12275",
+    "fidelityScripts": "tools/fidelity"
+  }
+}
