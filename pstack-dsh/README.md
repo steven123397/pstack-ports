@@ -1,10 +1,12 @@
 # pstack → DeepSeek Harness 移植
 
-> **状态：适配刚启动。本目录目前只有这份说明，尚未迁入 skill 正文，不可安装。**
+> **注意：本目录是 pstack 的 DeepSeek Harness 移植版，适配已暂停（2026-10-25），暂不可安装使用。**
 >
+> - 暂停于 2026-10-25：DSH 适配不再在本仓库环境继续，恢复时从下面「进度」段的未勾选项接着做。
+> - 已完成：目录骨架、平台事实记录（见下文表格），以及[现成方案与原生 seam 调研](RESEARCH-prior-art.md)。**未迁入 skill 正文。**
 > - 上游原文：[`cursor/plugins` 的 pstack](https://github.com/cursor/plugins/tree/main/pstack)，v0.15.29，commit `88d4751`。
 > - 移植方法：仓库根 [`PORTING-GUIDE.md`](../PORTING-GUIDE.md)。同类产物对照 [`pstack-omp/`](../pstack-omp/)（已完成）与 [`pstack-kimi/`](../pstack-kimi/)（已暂停）。
-> - 平台差异清单：`docs/harness/dsh.md`（尚未创建，下一步第一件事）。
+> - 平台差异清单：`docs/harness/dsh.md`（尚未创建，恢复时第一件事）。
 > - 现成方案与平台能力调研：[`RESEARCH-prior-art.md`](RESEARCH-prior-art.md)（2026-10-24）。结论：已有 5 个 pstack→DSH 移植；DSH 的 experimental seam（`create_worktree`、Agent Teams、`subagent` 路由字段）足以支撑自建缺失能力。
 
 ## 目标平台
@@ -48,6 +50,8 @@ omp 那份 `ADAPTATION.md` 里的五张表不能照抄，以下几条需要重�
 5. **分发**：没有 marketplace，安装路径要么 plugin bundle，要么直铺 skills 目录；PORTING-GUIDE 第 6 步的"两条安装路径各走一次"在这里要换成对应形式，并验证 #656 那个坑。
 
 ## 进度
+
+> 暂停于 2026-10-25。恢复时从下面第一个未勾选项接着做。
 
 - [x] 建立目录与分支 `dsh-port`
 - [x] 调研现成方案与 DSH 平台能力（见 [`RESEARCH-prior-art.md`](RESEARCH-prior-art.md)）

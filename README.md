@@ -13,7 +13,7 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：56 个
 | 目录 | 目标 | 状态 | 读哪里 |
 | --- | --- | --- | --- |
 | [`pstack-omp/`](pstack-omp/) | omp | ✅ 完成，可经 marketplace 分发 | [`ADAPTATION.md`](pstack-omp/ADAPTATION.md)、[`docs/harness/omp.md`](pstack-omp/docs/harness/omp.md) |
-| [`pstack-dsh/`](pstack-dsh/) | DeepSeek Harness | 🚧 进行中（骨架 + 调研） | [`README.md`](pstack-dsh/README.md)、[`RESEARCH-prior-art.md`](pstack-dsh/RESEARCH-prior-art.md) |
+| [`pstack-dsh/`](pstack-dsh/) | DeepSeek Harness | ⏸ 暂停（2026-10-25） | [`README.md`](pstack-dsh/README.md)、[`RESEARCH-prior-art.md`](pstack-dsh/RESEARCH-prior-art.md) |
 | [`pstack-kimi/`](pstack-kimi/) | Kimi Code | ⏸ 暂停（2026-10-24） | [`README.md`](pstack-kimi/README.md) 首段、[`docs/harness/kimicode.md`](pstack-kimi/docs/harness/kimicode.md) |
 | [`pstack-zh/`](pstack-zh/) | 阅读用中文版（不是 port） | ✅ 完成 | [`README.md`](pstack-zh/README.md) |
 
@@ -21,7 +21,7 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：56 个
 
 ## 怎么读
 
-- **想装来用**：看目标平台的产物目录，omp 走 [`pstack-omp/ADAPTATION.md`](pstack-omp/ADAPTATION.md) 的分发章节；dsh 尚未可装。
+- **想装来用**：看目标平台的产物目录，omp 走 [`pstack-omp/ADAPTATION.md`](pstack-omp/ADAPTATION.md) 的分发章节；dsh 已暂停、暂不可装。
 - **想理解 pstack 本身**：从 [`pstack-zh/README.md`](pstack-zh/README.md) 的阅读顺序开始，或直接读 `pstack-zh/skills/poteto-mode/SKILL.md`。
 - **想读懂移植怎么做**：[`PORTING-GUIDE.md`](PORTING-GUIDE.md)。
 - **想新增一个平台**：先读 [`docs/README.md`](docs/README.md) 的文档地图，再按 PORTING-GUIDE 的六步走。
