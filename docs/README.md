@@ -12,7 +12,6 @@
 | [`tools/fidelity/README.md`](../tools/fidelity/README.md) | 执行移植的人 | 三个只读脚本的用法与通过标准 | 脚本变化时 |
 | `pstack-<platform>/docs/harness/<platform>.md` | 模型与执行者（产物内） | 平台差异清单：工具名、子代理字段、模型路由、路径、跳过策略。是**产物的一部分**，随包分发 | 平台机制变化时 |
 | `pstack-<platform>/ADAPTATION.md` | 维护者（产物内） | 该平台的适配决策记录、验证结论、已知限制 | 决策变化时 |
-| `pstack-zh/README.md` | 中文读者 | 译文说明、相对底稿的改动、阅读顺序 | 上游译文更新时 |
 
 ## 三条写法约定
 
@@ -22,6 +21,6 @@
 
 ## 已知的重复与例外
 
-- 每个 `pstack-<platform>/skills/` 都是 56 个 skill 的完整副本。这是**交付形态**（包要能独立分发），不是重复建设；差异由 `tools/fidelity` 对照上游量化。
-- `pstack-zh/docs/harness/claude-code.md` 是上游官方适配文档的译文，属于译文内容，不是本仓库对 Claude Code 的移植结论。
+- 每个 `pstack-<platform>/skills/` 都是目标版本的全部 skill 副本（omp 58 个，kimi 基线 56 个）。这是**交付形态**（包要能独立分发），不是重复建设；差异由 `tools/fidelity` 对照上游量化。
+- `pstack-zh/` 已从仓库目录移除：中文译文只读 `.upstream/pstack-zh/`（gitignored 快照）。它不占产物层，也不代表任何平台的移植结论。
 - `.omp-plugin/marketplace.json` 必须在 omp 约定的路径上才能被发现，看起来像"藏起来的目录"，实为平台约定；作用在根 README 的产物矩阵里有指向。

@@ -1,8 +1,8 @@
 # pstack → omp 适配记录
 
-把 Cursor 插件 pstack（56 skills + 2 agents + 23 playbooks）改造成 omp 可用的 Agent Plugins 标准插件包。本文记录映射决策与可复用经验，供未来适配其他 agent 平台参考。
+把 Cursor 插件 pstack（58 skills + 2 agents + 23 playbooks）改造成 omp 可用的 Agent Plugins 标准插件包。本文记录映射决策与可复用经验，供未来适配其他 agent 平台参考。
 
-- 上游：`https://github.com/cursor/plugins`，pstack v0.15.29（commit 88d4751）
+- 上游：`https://github.com/cursor/plugins`，pstack v0.15.32（commit 99b609a）
 - 产物：`pstack-omp/`（本目录），Agent Plugins 1.0.0 标准包
 - 权威映射表：`docs/harness/omp.md`（会话级读一次，所有 skill 共同遵守）
 
@@ -14,7 +14,7 @@
 
 1. omp skill 注入是全文注入，正文写对了一劳永逸，不依赖模型先读映射表再自我翻译（上游方案要求"read this file once per session"，模型经常跳过）。
 2. pstack 的机制引用是行为语义（spawn 字段、模型路由、transcript 路径），错一个字段 task 调用直接被 schema 拒绝，静默漂移比显式改写更危险。
-3. 代价：上游更新时需要重新对 diff。用 git 仓库承载 pstack-omp，上游 commit 88d4751 为基线，后续可 `git diff` 驱动增量适配。
+3. 代价：上游更新时需要重新对 diff。用 git 仓库承载 pstack-omp，上游 commit 99b609a 为基线，后续可 `git diff` 驱动增量适配。
 
 ## 平台差异清单（Cursor → omp）
 
@@ -81,7 +81,11 @@ omp 无对应物的（Automations/Bugbot）：skill 步骤保留，执行时输�
 
 ## 验证
 
-- **安装/冒烟**：`omp plugin link` 后 56 个 skill 目录、23 个 playbook、5 个 agent 可发现；`skill://poteto-mode/references/review-triage.md` 正常解析，`pstack-{worker,judge,panel,reader}` 四个 agent 出现在 task 工具描述里，三角色分别解析到 deepseek-1017 / kimi-k3 / glm-5.3。
+- **安装/冒烟**：`omp plugin link` 后 58 个 skill 目录、23 个 playbook、5 个 agent 可发现；`skill://poteto-mode/references/review-triage.md` 正常解析，`pstack-{worker,judge,panel,reader}` 四个 agent 出现在 task 工具描述里，三角色分别解析到 deepseek-1017 / kimi-k3 / glm-5.3。
+- **0.15.32 增量（2026-10-25）**：pin 之后有 16 个提交动到 `pstack/`（47 个文件），逐个读过并落地。新增 `statechart`（脚本与测试 12k 行，逐字节保留）与 `ketchup-video`；同步 swarm 的步骤编号修复、reflect 的插件缓存规则、poteto-help 的两条路由、create-formal-verification-skill 的 statechart 指引、check-plan 的反引号识别、orch 优先活跃 PR、watch-pr 的 fork 识别与轮询上限、worktree-audit 的 GNU/BSD stat 探测。三个保真脚本复跑：`check_port` problems 0、`outline_compare` failures 0、`diff_bundle` 776 / 24644。
+- **新 skill 装载**：新进程 `omp -p` 里 `skill://ketchup-video/SKILL.md` 与 `skill://statechart/SKILL.md` 都读通；`omp plugin list` 显示 `0.15.32-omp1`。
+- **statechart 冒烟**：`statechart.mjs render test/band.mmd --out band.png` 在 Windows 产出 534×1162 PNG，标签文字正常，单次渲染 1.2 秒。`node --test test/statechart.test.mjs` 跑 150 项：port 54 通过 / 3 失败，3 项全是缺 `mise` 的安装路径用例；同一份 0.15.32 原稿在本机 53 通过 / 4 失败，多出的那项正是字体修复解决的 PNG 断言。
+- **脚本测试**：`bun test` 82 项，72 通过、10 失败；失败项全部依赖 Unix shebang 伪造的 `gh`/`origin`，同一批用例在 0.15.29 原稿上失败 5 项（本版新增的 5 个用例同因失败）。Windows 环境限制，不是移植引入。
 - **禁词扫描**：机制词已清空；剩余 `bugbot` 仅出现在 `watch-pr` 的 GitHub 作者识别代码与测试（判定评审线程来源，属功能而非适配），云/Bugbot 段落的说明性提及保留。
 - **worktree 审计**：临时 git 仓库 + worktree + 伪造 session JSONL，`LAST_CHAT` 输出了正确日期，bucket 从 `safe` 变为 `verify-recent-chat`；当前仓库解析到 `~/.omp/agent/sessions/--D--codex_project-pstack-ports--`。
 - **Jules CLI 试跑**：session 可创建、可并行、可 `remote pull` 出 patch；但 `--session` 会在 `#` 截断，只读任务取不到文字结论，PR 不自动创建。
@@ -103,7 +107,7 @@ omp plugin install pstack-omp@pstack-ports
 
 **不要给包加 root `plugin.json`**：一旦存在，skill 发现会让位给 `agent-plugins` 提供者的 Agent Skills 1.0.0 封闭字段校验，`disable-model-invocation`（以及同义的 `hide`、`disableModelInvocation`）不在字段集内，55 个 skill 被静默丢弃，而 `omp plugin doctor` 仍报全绿。实测：同一包无 `plugin.json` 时四个字段变体全部载入，有它时只剩不带字段的那个。git 直装（`omp plugin install github:…`) 要求仓库根有 `package.json`，本 monorepo 不满足，所以分发走 marketplace。
 
-`pstack-zh` 是中文自读版，没有 `package.json`，暂不作为插件分发。
+`pstack-zh` 是中文自读版，只存在于 `.upstream/pstack-zh/`（不进 git），没有 `package.json`，不分发。
 
 ## 已知限制
 
@@ -113,4 +117,7 @@ omp plugin install pstack-omp@pstack-ports
 - Qoder Cloud Agents MCP 未作为默认路径：它是通用沙箱，需 setup script 自行 clone，且不自动产出 PR。
 - Bugbot 环节跳过：omp 没有自动 PR 评审。人类或其他 bot 留下的 review thread 仍按 `review-triage.md` 分诊，未解决线程仍会阻塞 `watch-pr` 的 `READY`；只是不再等待或配置 Bugbot。
 - omp 无 per-item effort 默认暴露（`task.enableEffort` 默认 off）：思考档位随 modelRoles 的 thinking 后缀走。
+- `statechart` 的 `from-spec` / `from-chart` 依赖 TLC 与 Java，首次运行由 `mise` 安装（约 305 MB，需联网）；本机没有 mise，只验证了 `--help` 与 `render`（PNG 生成），TLC 路径未实跑。没有 mise 时用 `TLA2TOOLS`、`JAVA` 指向已有安装。
+- Windows 没有 fontconfig，`fc-match` 失败会让 resvg 把所有标签画成缺字方块；只给字体族名又会让它每次测量都扫描全部系统字体，单次渲染约 25 秒。本包在 `statechart/scripts/render.mjs` 的 `fcMatch()` 里加了 Windows 兜底：把 `system-ui` / `Segoe UI` 解析成 `%WINDIR%\Fonts\segoeui*.ttf`，渲染回到 1.2 秒，PNG 文字正常。这是唯一一处对上游脚本的功能性改动。
+- `bun test` 里依赖 Unix shebang 伪 `gh`/`origin` 的 Store 与 fork 识别用例在 Windows 上必失败；判定依据见"验证"一节的原稿对照。
 - benny automations（上游 automations/ 目录，Issue 自动化）未纳入本包：其价值依赖 Cursor Automations 运行时，omp 无 webhook/常驻例程机制。留在上游，未来 omp 出现等价物再评估。

@@ -19,12 +19,12 @@ Open a todolist with one entry per phase before launching anything.
 
 1. State the done predicate and the artifact or report the swarm must return.
 2. Choose the shape. Partition into slices, race N workers on identical briefs, or mix both. For a race or mixed shape, declare `first pass`, `rank all`, or `best-of` before spawning.
-4. Pick the worker seat: `agent: "pstack-worker"` (`@pstack-fast`). For a model race, the other arm uses `agent: "pstack-panel"`, named up front. Omit per-item `model`; a role left unset runs on the parent model. If a role resolves to no available model, that arm runs on the parent session model, so say so. Pick each subagent's thinking level per the Subagents section of the **poteto-mode** skill.
-5. Give each worker its own writable output when it writes. When workers verify or measure commits, each brief names the exact SHAs. A measurement brief also names the method (sample count, what one sample is, order). The worker records both in its result.
+3. Pick the worker seat: `agent: "pstack-worker"` (`@pstack-fast`). For a model race, the other arm uses `agent: "pstack-panel"`, named up front. Omit per-item `model`; a role left unset runs on the parent model. If a role resolves to no available model, that arm runs on the parent session model, so say so. Pick each subagent's thinking level per the Subagents section of the **poteto-mode** skill.
+4. Give each worker its own writable output when it writes. When workers verify or measure commits, each brief names the exact SHAs. A measurement brief also names the method (sample count, what one sample is, order). The worker records both in its result.
 
 ## Phase B: Fan out
 
-Spawn all N workers in one `task` call with the step 4 agent and `isolated: true` on each item. Isolation requires `task.isolation.enabled`, and ignored files such as `node_modules` do not carry over, so a worker that runs tests must install dependencies first. When that setting is off, give each worker its own branch or worktree and name it in the brief, so no two workers write the same checkout. Fan-out that must outlive this machine runs as Jules sessions instead, per the Cloud workers section of the plugin's `docs/harness/omp.md`. Omit isolation only when the worker needs the shared checkout or something else on this machine, and say so in the brief.
+Spawn all N workers in one `task` call with the step 3 agent and `isolated: true` on each item. Isolation requires `task.isolation.enabled`, and ignored files such as `node_modules` do not carry over, so a worker that runs tests must install dependencies first. When that setting is off, give each worker its own branch or worktree and name it in the brief, so no two workers write the same checkout. Fan-out that must outlive this machine runs as Jules sessions instead, per the Cloud workers section of the plugin's `docs/harness/omp.md`. Omit isolation only when the worker needs the shared checkout or something else on this machine, and say so in the brief.
 
 When a worker must start from a non-default pushed branch, name that branch in the brief so the worker checks it out first.
 
@@ -38,4 +38,4 @@ Read the terminal results. Drop a result that does not record the SHAs and metho
 
 ## Phase D: Report
 
-Return one consolidated in-chat report with the table, issue one-liners, gaps or dropouts, and the race rule when used.
+Return one consolidated in-chat report with a result table, issue one-liners, gaps or dropouts, and the race rule when used.

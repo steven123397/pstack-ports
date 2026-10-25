@@ -1,10 +1,10 @@
 # pstack-ports
 
-pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：56 个 skill、23 个 playbook、24 条原则、2 个子代理，核心是 `/poteto-mode`。它的价值不在某个平台的 API，而在**流程与原则**——所以它可以被搬走。
+pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：58 个 skill、23 个 playbook、24 条原则、2 个子代理，核心是 `/poteto-mode`。它的价值不在某个平台的 API，而在**流程与原则**——所以它可以被搬走。
 
 本仓库是 pstack 跨 agent harness 适配的**统一存放处**。每适配一个平台，这里多一份可安装的产物、一份平台差异清单、一次保真验证；方法本身沉淀成一份可复用指南。
 
-- 上游：`cursor/plugins` 的 `pstack`，v0.15.29（commit `88d4751`），MIT。基线锁定在 [`UPSTREAM.json`](UPSTREAM.json)。
+- 上游：`cursor/plugins` 的 `pstack`，v0.15.32（commit `99b609a`），MIT。基线锁定在 [`UPSTREAM.json`](UPSTREAM.json)。
 - 方法：[`PORTING-GUIDE.md`](PORTING-GUIDE.md)（六步流程 + 十条教训）。
 - 状态：[`docs/status.md`](docs/status.md)（唯一状态源，含每个产物的验证方式）。
 
@@ -15,14 +15,13 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：56 个
 | [`pstack-omp/`](pstack-omp/) | omp | ✅ 完成，可经 marketplace 分发 | [`ADAPTATION.md`](pstack-omp/ADAPTATION.md)、[`docs/harness/omp.md`](pstack-omp/docs/harness/omp.md) |
 | [`pstack-dsh/`](pstack-dsh/) | DeepSeek Harness | ⏸ 暂停（2026-10-25） | [`README.md`](pstack-dsh/README.md)、[`RESEARCH-prior-art.md`](pstack-dsh/RESEARCH-prior-art.md) |
 | [`pstack-kimi/`](pstack-kimi/) | Kimi Code | ⏸ 暂停（2026-10-24） | [`README.md`](pstack-kimi/README.md) 首段、[`docs/harness/kimicode.md`](pstack-kimi/docs/harness/kimicode.md) |
-| [`pstack-zh/`](pstack-zh/) | 阅读用中文版（不是 port） | ✅ 完成 | [`README.md`](pstack-zh/README.md) |
 
-`pstack-zh/` 是上游的中文自读版，用于理解每个 skill 在做什么，不作为插件分发；它和 port 同层只是为了方便对照。
+中文自读版不是产物，只存在于 `.upstream/pstack-zh/`（`sync.mjs` 拉取，gitignored），不占仓库目录。
 
 ## 怎么读
 
 - **想装来用**：看目标平台的产物目录，omp 走 [`pstack-omp/ADAPTATION.md`](pstack-omp/ADAPTATION.md) 的分发章节；dsh 已暂停、暂不可装。
-- **想理解 pstack 本身**：从 [`pstack-zh/README.md`](pstack-zh/README.md) 的阅读顺序开始，或直接读 `pstack-zh/skills/poteto-mode/SKILL.md`。
+- **想理解 pstack 本身**：读 `.upstream/cursor-plugins/pstack/` 英文原文，或 `.upstream/pstack-zh/` 的中文译文（先跑 `node tools/upstream/sync.mjs`；译文停在 0.15.29，`statechart`、`ketchup-video` 只有英文）。
 - **想读懂移植怎么做**：[`PORTING-GUIDE.md`](PORTING-GUIDE.md)。
 - **想新增一个平台**：先读 [`docs/README.md`](docs/README.md) 的文档地图，再按 PORTING-GUIDE 的六步走。
 
@@ -34,9 +33,8 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：56 个
 | --- | --- | --- | --- |
 | 仓库层 | `README.md`、`UPSTREAM.json`、`docs/status.md` | 总入口、上游 pin、状态矩阵 | 单个平台的映射细节 |
 | 方法层 | `PORTING-GUIDE.md`、`tools/fidelity/` | 可复用的流程与脚本 | 与某个平台绑定的命令、一次性证据 |
-| 依赖层 | `.upstream/`（gitignored） | 上游原文快照，由 `tools/upstream/sync.mjs` 按 `UPSTREAM.json` 的 pin 拉取 | 手改；提交进 git |
+| 依赖层 | `.upstream/`（gitignored） | 上游原文快照与中文译文快照，由 `tools/upstream/sync.mjs` 按 `UPSTREAM.json` 的 pin 拉取 | 手改；提交进 git |
 | 产物层 | `pstack-<platform>/` | 自包含、可直接分发的插件包：`skills/`、`agents/`、平台清单、包内映射表与决策记录 | 仓库级索引 |
-| 翻译层 | `pstack-zh/` | 上游中文译文与教程 | 适配决策 |
 
 产物层每个目录都**自包含**：它要能被单独打包分发，所以允许与其它 port 重复（`skills/` 是逐份副本）。重复是交付形态，不是结构问题；差异靠 `tools/fidelity` 对照上游量化。
 

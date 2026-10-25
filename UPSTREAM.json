@@ -5,15 +5,25 @@
       "role": "pstack 英文原文，所有 port 的保真基线",
       "repo": "https://github.com/cursor/plugins.git",
       "subdir": "pstack",
-      "version": "0.15.29",
-      "commit": "88d47514b82e7c44f00f2b2a72ff6dd12158038c",
-      "commitDate": "2026-10-19",
+      "version": "0.15.32",
+      "commit": "99b609a72323b70204eab407c622f436e858e112",
+      "commitDate": "2026-10-24",
       "license": "MIT",
       "checkout": ".upstream/cursor-plugins",
       "sparse": ["pstack"]
     },
+    "pstack-zcode": {
+      "role": "ChHsiching 的 pstack→ZCode 现成移植（git subtree 跟上游 cursor/plugins）；只作为审核对照快照存在于 .upstream/，不进 git，不是任何 port 的移植基线",
+      "repo": "https://github.com/ChHsiching/pstack-zcode.git",
+      "version": "0.15.32",
+      "commit": "9c64e3af5bbf80e1bb98fa1f61a40b8ddce5557e",
+      "commitDate": "2026-10-25",
+      "license": "MIT",
+      "checkout": ".upstream/pstack-zcode",
+      "sparse": []
+    },
     "pstack-zh": {
-      "role": "pstack 中文译文底稿；pstack-zh/ 的对照源，不是任何 port 的移植基线",
+      "role": "pstack 中文译文底稿；只作为阅读快照存在于 .upstream/，不进 git，不是任何 port 的移植基线",
       "repo": "https://github.com/fenfenxu/pstack-zh.git",
       "version": "0.15.29",
       "commit": "e4477188d43269545432a83e4ac5d0733a812d09",
@@ -24,14 +34,14 @@
     }
   },
   "counts": {
-    "skills": 56,
+    "skills": 58,
     "playbooks": 23,
     "principles": 24,
     "agents": 2
   },
   "fidelity": {
     "upstreamPath": ".upstream/cursor-plugins/pstack",
-    "changedLinesBaseline": "739 / 12275",
+    "changedLinesBaseline": "776 / 24644",
     "scripts": "tools/fidelity"
   }
 }
