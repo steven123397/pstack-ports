@@ -33,7 +33,7 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：56 个
 | 层 | 路径 | 放什么 | 不该放什么 |
 | --- | --- | --- | --- |
 | 仓库层 | `README.md`、`UPSTREAM.json`、`docs/status.md` | 总入口、上游 pin、状态矩阵 | 单个平台的映射细节 |
-| 方法层 | `PORTING-GUIDE.md`、`tools/fidelity/`、`verify/` | 可复用的流程、脚本、验证资产 | 与某个平台绑定的命令 |
+| 方法层 | `PORTING-GUIDE.md`、`tools/fidelity/` | 可复用的流程与脚本 | 与某个平台绑定的命令、一次性证据 |
 | 产物层 | `pstack-<platform>/` | 自包含、可直接分发的插件包：`skills/`、`agents/`、平台清单、包内映射表与决策记录 | 仓库级索引 |
 | 翻译层 | `pstack-zh/` | 上游中文译文与教程 | 适配决策 |
 
@@ -49,7 +49,7 @@ python tools/fidelity/check_port.py --port pstack-<platform> --allow url
 python tools/fidelity/outline_compare.py --upstream <上游根> --port pstack-<platform> --subdir skills
 ```
 
-`check_port.py` 的 `problems 0` 与 `outline_compare.py` 的 `failures 0` 是硬闸门；改动行数只是定位信号。平台侧的运行验证资产见 [`verify/README.md`](verify/README.md)。
+`check_port.py` 的 `problems 0` 与 `outline_compare.py` 的 `failures 0` 是硬闸门；改动行数只是定位信号。运行侧验证只做一次、结论进 [`docs/status.md`](docs/status.md)，脚本与证据不常设入库。
 
 ## 新增一个平台的最小动作
 
@@ -58,7 +58,7 @@ python tools/fidelity/outline_compare.py --upstream <上游根> --port pstack-<p
 3. 迁入上游原稿作基线，按文件机械改写，跑禁词扫描。
 4. 跑 `tools/fidelity` 三个脚本，两个硬闸门清零。
 5. 按语义切片做语义审查（四分类 rubric，两端原文引用）。
-6. 装一次、真实调用一次，把验证资产放到 `verify/<platform>/`，状态写进 [`docs/status.md`](docs/status.md)。
+6. 装一次、真实调用一次；只把结论写进 [`docs/status.md`](docs/status.md)，一次性脚本与证据不入库。
 
 ## 许可
 

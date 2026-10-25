@@ -9,7 +9,6 @@
 | [`status.md`](status.md) | 维护者 | **唯一状态源**：每个产物的状态、最后确认时间、验证方式、再生命令 | 每次验证后 |
 | [`PORTING-GUIDE.md`](../PORTING-GUIDE.md) | 新移植者 | 方法论：三种移植姿态、六步流程、十条教训、未解项 | 方法本身变化时 |
 | [`tools/fidelity/README.md`](../tools/fidelity/README.md) | 执行移植的人 | 三个只读脚本的用法与通过标准 | 脚本变化时 |
-| [`verify/README.md`](../verify/README.md) | 验证者 | 各平台运行验证资产的位置与证据策略 | 新增验证资产时 |
 | `pstack-<platform>/docs/harness/<platform>.md` | 模型与执行者（产物内） | 平台差异清单：工具名、子代理字段、模型路由、路径、跳过策略。是**产物的一部分**，随包分发 | 平台机制变化时 |
 | `pstack-<platform>/ADAPTATION.md` | 维护者（产物内） | 该平台的适配决策记录、验证结论、已知限制 | 决策变化时 |
 | `pstack-zh/README.md` | 中文读者 | 译文说明、相对底稿的改动、阅读顺序 | 上游译文更新时 |
@@ -24,4 +23,4 @@
 
 - 每个 `pstack-<platform>/skills/` 都是 56 个 skill 的完整副本。这是**交付形态**（包要能独立分发），不是重复建设；差异由 `tools/fidelity` 对照上游量化。
 - `pstack-zh/docs/harness/claude-code.md` 是上游官方适配文档的译文，属于译文内容，不是本仓库对 Claude Code 的移植结论。
-- `.omp-plugin/marketplace.json` 与 `.omp/skills/verify-pstack-port/` 必须在 omp 约定的路径上才能被加载，看起来像"藏起来的目录"，实为平台约定；作用在 [`verify/README.md`](../verify/README.md) 与根 README 里有指向。
+- `.omp-plugin/marketplace.json` 必须在 omp 约定的路径上才能被发现，看起来像"藏起来的目录"，实为平台约定；作用在根 README 的产物矩阵里有指向。
