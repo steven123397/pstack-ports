@@ -5,7 +5,8 @@
 | 文档 | 读者 | 职责 | 何时更新 |
 | --- | --- | --- | --- |
 | [`README.md`](../README.md) | 所有人 | 项目定位、产物矩阵、目录分层、快速开始 | 新增或关闭一个 port 时 |
-| [`UPSTREAM.json`](../UPSTREAM.json) | 维护者、脚本 | 上游 pin（版本、commit、本地镜像、计数），机器可读 | 升级上游时，先改这里 |
+| [`UPSTREAM.json`](../UPSTREAM.json) | 维护者、脚本 | 上游源与 pin（版本、commit、稀疏路径、计数），机器可读；`.upstream/` 由它驱动 | 升级上游时，先改这里 |
+| [`tools/upstream/sync.mjs`](../tools/upstream/sync.mjs) | 执行移植的人 | 按 pin 把上游拉到 `.upstream/`；`--check` 只报告落后多少提交 | pin 或上游地址变化时 |
 | [`status.md`](status.md) | 维护者 | **唯一状态源**：每个产物的状态、最后确认时间、验证方式、再生命令 | 每次验证后 |
 | [`PORTING-GUIDE.md`](../PORTING-GUIDE.md) | 新移植者 | 方法论：三种移植姿态、六步流程、十条教训、未解项 | 方法本身变化时 |
 | [`tools/fidelity/README.md`](../tools/fidelity/README.md) | 执行移植的人 | 三个只读脚本的用法与通过标准 | 脚本变化时 |

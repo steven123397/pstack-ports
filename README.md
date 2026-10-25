@@ -34,6 +34,7 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：56 个
 | --- | --- | --- | --- |
 | 仓库层 | `README.md`、`UPSTREAM.json`、`docs/status.md` | 总入口、上游 pin、状态矩阵 | 单个平台的映射细节 |
 | 方法层 | `PORTING-GUIDE.md`、`tools/fidelity/` | 可复用的流程与脚本 | 与某个平台绑定的命令、一次性证据 |
+| 依赖层 | `.upstream/`（gitignored） | 上游原文快照，由 `tools/upstream/sync.mjs` 按 `UPSTREAM.json` 的 pin 拉取 | 手改；提交进 git |
 | 产物层 | `pstack-<platform>/` | 自包含、可直接分发的插件包：`skills/`、`agents/`、平台清单、包内映射表与决策记录 | 仓库级索引 |
 | 翻译层 | `pstack-zh/` | 上游中文译文与教程 | 适配决策 |
 
@@ -41,12 +42,18 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：56 个
 
 ## 保真与验证
 
-移植的质量判断不靠感觉，靠三个只读脚本（用法见 [`tools/fidelity/README.md`](tools/fidelity/README.md)）：
+上游原文不进 git。首次使用先按 [`UPSTREAM.json`](UPSTREAM.json) 的 pin 拉取到 `.upstream/`：
 
 ```bash
-python tools/fidelity/diff_bundle.py --upstream <上游根> --port pstack-<platform> --subdir skills --out %TEMP%/fidelity
+node tools/upstream/sync.mjs        # 拉到 pin；加 --check 只报告上游有多少新提交
+```
+
+移植的质量判断不靠感觉，靠三个只读脚本（用法见 [`tools/fidelity/README.md`](tools/fidelity/README.md)，`--upstream` 已有默认值）：
+
+```bash
+python tools/fidelity/diff_bundle.py --port pstack-<platform> --subdir skills --out %TEMP%/fidelity
 python tools/fidelity/check_port.py --port pstack-<platform> --allow url
-python tools/fidelity/outline_compare.py --upstream <上游根> --port pstack-<platform> --subdir skills
+python tools/fidelity/outline_compare.py --port pstack-<platform> --subdir skills
 ```
 
 `check_port.py` 的 `problems 0` 与 `outline_compare.py` 的 `failures 0` 是硬闸门；改动行数只是定位信号。运行侧验证只做一次、结论进 [`docs/status.md`](docs/status.md)，脚本与证据不常设入库。

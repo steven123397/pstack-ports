@@ -12,6 +12,8 @@ import re
 HEADING = re.compile(r"^(#{2,4})\s*(.+)$")
 NUMBERED = re.compile(r"^(?:\d+\.|[-*]\s\*\*|###?\s*\d)")
 STEP_PREFIX = re.compile(r"^\d+[a-z]?\.\s*")
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DEFAULT_UPSTREAM = os.path.join(REPO_ROOT, ".upstream", "cursor-plugins", "pstack")
 
 
 def walk(root):
@@ -39,11 +41,13 @@ def outline(path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--upstream", required=True)
+    parser.add_argument("--upstream", default=DEFAULT_UPSTREAM, help="upstream pstack tree (default: %(default)s)")
     parser.add_argument("--port", required=True)
     parser.add_argument("--subdir", default="skills")
     parser.add_argument("--ignore", action="append", default=[], help="substring skipped as a known rename or drop")
     args = parser.parse_args()
+    if not os.path.isdir(args.upstream):
+        raise SystemExit(f"upstream not found: {args.upstream}\nrun: node tools/upstream/sync.mjs")
 
     prefix = args.subdir.strip("/") + "/"
     up_files = {rel for rel in walk(args.upstream) if rel.startswith(prefix)}

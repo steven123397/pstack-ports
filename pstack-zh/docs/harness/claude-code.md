@@ -1,6 +1,6 @@
 # pstack 在 Claude Code 中
 
-> 译自 cursor/plugins 0.15.29 `pstack/docs/harness/claude-code.md`（本地英文原文在 `../../../../upstreams/pstack/pstack/docs/harness/claude-code.md`）。
+> 译自 cursor/plugins 0.15.29 `pstack/docs/harness/claude-code.md`（英文原文在 `.upstream/cursor-plugins/pstack/docs/harness/claude-code.md`，由 `node tools/upstream/sync.mjs` 拉取）。
 
 pstack 的 skills 用的是 Cursor 的名字。在 Claude Code 里，每个会话读一遍这个文件，然后用下面的表把 skill 里出现的每个 Cursor 名字映射过去。`<pstack>` 指存放 `skills/` 和 `docs/` 的那个目录。表里没有对应行的 Cursor 字段：直接丢弃，并说明丢掉了什么。绝不传工具 schema 不接受的字段或值。
 

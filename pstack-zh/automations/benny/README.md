@@ -1,6 +1,6 @@
 # benny
 
-> 译自 cursor/plugins 0.15.29 `pstack/automations/benny/README.md`。本目录的 `skills/` 子目录与 `templates/` 是自动化源文件，自读版保留英文原文，见 `../../../../upstreams/pstack/pstack/automations/benny/`。
+> 译自 cursor/plugins 0.15.29 `pstack/automations/benny/README.md`。本目录的 `skills/` 子目录与 `templates/` 是自动化源文件，自读版保留英文原文，见 `.upstream/cursor-plugins/pstack/automations/benny/`。
 
 benny 给你两个处理 Slack issue 报告的 Cursor automation。一个分诊每份报告。另一个复现确认过的 bug，可能还会准备一份小的草稿修复。
 

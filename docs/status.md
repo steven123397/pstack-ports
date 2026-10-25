@@ -13,10 +13,11 @@
 
 ## 再生命令
 
-上游 pin 与计数（改上游后重跑）：
+上游与计数（改上游后重跑）：
 
 ```bash
-cat UPSTREAM.json
+node tools/upstream/sync.mjs          # 按 UPSTREAM.json 的 pin 拉到 .upstream/
+node tools/upstream/sync.mjs --check  # 只报告各源在 pin 之后有多少新提交
 git ls-files 'pstack-*/skills/*/SKILL.md' | wc -l
 ```
 
@@ -24,10 +25,14 @@ omp 的保真闸门（运行验证已于 2026-10-22 做过一次，脚本未保�
 
 ```bash
 python tools/fidelity/check_port.py --port pstack-omp --allow url
-python tools/fidelity/outline_compare.py --upstream <上游根> --port pstack-omp --subdir skills --ignore bugbot-triage
+python tools/fidelity/outline_compare.py --port pstack-omp --subdir skills --ignore bugbot-triage
 ```
 
 dsh / kimi 目前没有可跑的验证命令；恢复或继续时按 [PORTING-GUIDE](../PORTING-GUIDE.md) 第 4–5 步做一次，再把结论写进本表。
+
+## 上游漂移
+
+截至 2026-10-25，`cursor/plugins` 的 main 在 pin 之后有 **67** 个提交（`node tools/upstream/sync.mjs --check` 可复现）。升级上游是独立决定：先改 `UPSTREAM.json` 的 pin，再逐 port 重跑保真闸门与语义审查，不要顺手升级。
 
 ## 更新规则
 

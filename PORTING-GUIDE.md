@@ -26,7 +26,7 @@
 
 ### 1. 固化基线
 
-上游仓库保持只读，放在 `D:/codex_project/upstreams/pstack`。产物是同一个 git 仓库里的子目录 `pstack-omp/`。上游 commit 记进 `ADAPTATION.md` 开头。
+上游仓库保持只读：pin 记在 `UPSTREAM.json`，运行 `node tools/upstream/sync.mjs` 把它拉到 `.upstream/cursor-plugins/pstack`（`.upstream/` 不进 git）。产物是同一个 git 仓库里的子目录 `pstack-omp/`。上游 commit 记进 `ADAPTATION.md` 开头。
 
 这样做的目的只有一个，任何一行产物都能回答"它对应上游哪一行"，增量移植靠 `git diff` 驱动。
 
@@ -136,4 +136,4 @@ omp plugin install <name>@<catalog>
 
 ## 工具
 
-三个脚本在 [`tools/fidelity/`](tools/fidelity/)，用法与通过标准见同目录的 `README.md`。它们只读，任何时候都可以重跑。
+上游拉取在 [`tools/upstream/sync.mjs`](tools/upstream/sync.mjs)，按 `UPSTREAM.json` 的 pin 工作；`--check` 只报告落后多少提交。三个保真脚本在 [`tools/fidelity/`](tools/fidelity/)，用法与通过标准见同目录的 `README.md`。它们只读，任何时候都可以重跑。

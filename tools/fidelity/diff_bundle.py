@@ -10,6 +10,8 @@ import os
 import shutil
 
 SKIP_DIRS = {".git", "node_modules", "dist"}
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DEFAULT_UPSTREAM = os.path.join(REPO_ROOT, ".upstream", "cursor-plugins", "pstack")
 
 
 def walk(root):
@@ -31,12 +33,14 @@ def read_lines(path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--upstream", required=True)
+    parser.add_argument("--upstream", default=DEFAULT_UPSTREAM, help="upstream pstack tree (default: %(default)s)")
     parser.add_argument("--port", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--subdir", default="", help="restrict to one subtree, for example skills")
     parser.add_argument("--context", type=int, default=3)
     args = parser.parse_args()
+    if not os.path.isdir(args.upstream):
+        raise SystemExit(f"upstream not found: {args.upstream}\nrun: node tools/upstream/sync.mjs")
 
     up_files, port_files = walk(args.upstream), walk(args.port)
     if args.subdir:

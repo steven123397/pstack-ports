@@ -1,6 +1,6 @@
 # benny 自动化意图
 
-> 译自 cursor/plugins 0.15.29 `pstack/automations/benny/FOR_AGENTS.md`。同目录的 `skills/`、`templates/` 子文件自读版保留英文原文，见 `../../../../upstreams/pstack/pstack/automations/benny/`。
+> 译自 cursor/plugins 0.15.29 `pstack/automations/benny/FOR_AGENTS.md`。同目录的 `skills/`、`templates/` 子文件自读版保留英文原文，见 `.upstream/cursor-plugins/pstack/automations/benny/`。
 
 ## 我想自动化什么
 

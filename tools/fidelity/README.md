@@ -4,11 +4,20 @@
 
 它们不判断语义好坏，只把人工判断需要的证据准备齐。语义判断仍要看 diff 的正文。
 
+## 0. 准备上游
+
+上游原文不进 git。首次运行前，按 [`UPSTREAM.json`](../../UPSTREAM.json) 的 pin 拉取到 `.upstream/`（已 gitignore）：
+
+```bash
+node tools/upstream/sync.mjs
+```
+
+`--upstream` 默认指向 `.upstream/cursor-plugins/pstack`，一般不用传。`node tools/upstream/sync.mjs --check` 只报告上游在 pin 之后有多少新提交，不移动 pin。
+
 ## 1. 差分清单
 
 ```bash
 python tools/fidelity/diff_bundle.py \
-  --upstream D:/codex_project/upstreams/pstack/pstack \
   --port pstack-omp \
   --subdir skills \
   --out %TEMP%/fidelity
@@ -37,7 +46,6 @@ python tools/fidelity/check_port.py --port pstack-omp --allow url
 
 ```bash
 python tools/fidelity/outline_compare.py \
-  --upstream D:/codex_project/upstreams/pstack/pstack \
   --port pstack-omp \
   --subdir skills \
   --ignore bugbot-triage
