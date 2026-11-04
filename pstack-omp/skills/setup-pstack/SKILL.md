@@ -12,8 +12,8 @@ pstack routes work by role, and each role is pinned by one agent definition. The
 | Role | Pinned by | Covers |
 | --- | --- | --- |
 | `@pstack-fast` | `pstack-worker` agent | Code delegates: playbook work (feature, bug-fix, refactoring, perf-issue, hillclimb), swarm workers, how explorers, why investigators, reflect tooling. Default for every worker unless a panel seat assigns `pstack-panel` per arm. |
-| `@pstack-judge` | `pstack-judge` agent | Judgment and prose: hardest tasks, how explainers, why synthesizers, reflect judgment/divergent/synthesizer, arena cross-judge. |
-| `@pstack-panel` | `pstack-panel` agent | Second seat of multi-model panels (arena runners, architect runners, interrogate reviewers). Pick a different model family from `@pstack-fast`, or the panel loses its point. |
+| `@pstack-judge` | `pstack-judge` agent | Judgment and prose: hardest tasks, how explainers, why synthesizers, reflect judgment/divergent/synthesizer, and the arena cross-judge when `@pstack-panel` does not resolve to another family. |
+| `@pstack-panel` | `pstack-panel` agent | Second seat of multi-model panels (arena runners, architect runners, interrogate reviewers), and the preferred arena cross-judge. Pick a different model family from `@pstack-fast` and from the parent chat, or the panel loses its point. |
 | `@pstack-fast` | `pstack-reader` agent (read-only) | Read-only investigation: explorers, evidence gathering. Its `tools` list has no write tools, so it cannot edit. |
 
 A role left unset inherits the parent session model. That is the out-of-box default for all three: pstack works before setup, just without model diversity.
@@ -59,7 +59,7 @@ On yes, `omp config set task.isolation.enabled true` and `omp config set task.is
 
 **(b) Apply it.** Build the working table from the current state (step 2). The budget rewrites only the thinking suffix of real model selectors, to `max`, `xhigh`, `high`, or `medium`, on the ladder `max` > `xhigh` > `high` > `medium` > `low`. If the target level is not in the model's supported list from `omp models`, use its highest supported level at or below the target. Aliases (`@smol` and friends) and inherit-parent entries never change — their thinking follows whatever they point at.
 
-**(c) Show the roles and confirm.** Show every role from the contract table with its value, marking any real selector not in the detected set as needing a choice. Ask whether to accept as-is or change specific roles, offering the detected models, the `@smol`/`@default`/`@slow` aliases, and inherit-parent as the options. Use the ask tool. Remind the user that `@pstack-panel` should differ in family from `@pstack-fast`.
+**(c) Show the roles and confirm.** Show every role from the contract table with its value, marking any real selector not in the detected set as needing a choice. Ask whether to accept as-is or change specific roles, offering the detected models, the `@smol`/`@default`/`@slow` aliases, and inherit-parent as the options. Use the ask tool. Remind the user that `@pstack-panel` should differ in family from `@pstack-fast` and from their usual chat model. Arena runs one judge. It tries `@pstack-panel`, then `@pstack-judge`, and uses only a role that resolves to a family other than the parent's; an inherit-parent role never judges. When neither supplies another family, Arena skips the judge.
 
 ### 5. Validate
 

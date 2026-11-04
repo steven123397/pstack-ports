@@ -4,7 +4,7 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：58 个
 
 本仓库是 pstack 跨 agent harness 适配的**统一存放处**。每适配一个平台，这里多一份可安装的产物、一份平台差异清单、一次保真验证；方法本身沉淀成一份可复用指南。
 
-- 上游：`cursor/plugins` 的 `pstack`，v0.15.32（commit `99b609a`），MIT。基线锁定在 [`UPSTREAM.json`](UPSTREAM.json)。
+- 上游：`cursor/plugins` 的 `pstack`，v0.15.36（commit `fd268b8`），MIT。基线锁定在 [`UPSTREAM.json`](UPSTREAM.json)。
 - 方法：[`PORTING-GUIDE.md`](PORTING-GUIDE.md)（六步流程 + 十条教训）。
 - 状态：[`docs/status.md`](docs/status.md)（唯一状态源，含每个产物的验证方式）。
 
@@ -22,6 +22,7 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：58 个
 
 - **想装来用**：看目标平台的产物目录，omp 走 [`pstack-omp/ADAPTATION.md`](pstack-omp/ADAPTATION.md) 的分发章节；dsh 已暂停、暂不可装。
 - **想理解 pstack 本身**：读 `.upstream/cursor-plugins/pstack/` 英文原文，或 `.upstream/pstack-zh/` 的中文译文（先跑 `node tools/upstream/sync.mjs`；译文停在 0.15.29，`statechart`、`ketchup-video` 只有英文）。
+- **想对照别人的 Claude Code 移植**：读 `.upstream/pstack-claude/`（michael-denyer，0.9.103）与 `.upstream/open-pstack/`（ericlitman，1.16.0）。两者只是参考快照，不是本仓库的移植基线。
 - **想读懂移植怎么做**：[`PORTING-GUIDE.md`](PORTING-GUIDE.md)。
 - **想新增一个平台**：先读 [`docs/README.md`](docs/README.md) 的文档地图，再按 PORTING-GUIDE 的六步走。
 
@@ -33,7 +34,7 @@ pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：58 个
 | --- | --- | --- | --- |
 | 仓库层 | `README.md`、`UPSTREAM.json`、`docs/status.md` | 总入口、上游 pin、状态矩阵 | 单个平台的映射细节 |
 | 方法层 | `PORTING-GUIDE.md`、`tools/fidelity/` | 可复用的流程与脚本 | 与某个平台绑定的命令、一次性证据 |
-| 依赖层 | `.upstream/`（gitignored） | 上游原文快照与中文译文快照，由 `tools/upstream/sync.mjs` 按 `UPSTREAM.json` 的 pin 拉取 | 手改；提交进 git |
+| 依赖层 | `.upstream/`（gitignored） | 上游原文快照、参考移植快照与中文译文快照，由 `tools/upstream/sync.mjs` 按 `UPSTREAM.json` 的 pin 拉取 | 手改；提交进 git |
 | 产物层 | `pstack-<platform>/` | 自包含、可直接分发的插件包：`skills/`、`agents/`、平台清单、包内映射表与决策记录 | 仓库级索引 |
 
 产物层每个目录都**自包含**：它要能被单独打包分发，所以允许与其它 port 重复（`skills/` 是逐份副本）。重复是交付形态，不是结构问题；差异靠 `tools/fidelity` 对照上游量化。

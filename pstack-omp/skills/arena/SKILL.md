@@ -14,7 +14,7 @@ Every candidate gets the same prompt, so the prompt is the contract.
 
 1. State the artifact each candidate is producing.
 2. Derive the rubric, 3-6 concrete gradeable criteria for what success looks like on *this* task. It is the picker's tool in Phase D. Candidates only see the task.
-3. Pick the runners. Use `agent: "pstack-worker"` for one seat and `agent: "pstack-panel"` for the other: two families, or the arena is only a second opinion. Omit per-item `model`; each agent's frontmatter pins its role. If a role resolves to no available model, that seat runs on the parent session model, so say so. Spawn more runners when the arena covers multiple design directions. Use the same agent N times when the work is generation-bound rather than judgment-sensitive. Pick each subagent's thinking level per the Subagents section of the **poteto-mode** skill.
+3. Pick the runners. Use `agent: "pstack-worker"` for one seat and `agent: "pstack-panel"` for the other: two families, or the arena is only a second opinion. Omit per-item `model`; each agent's frontmatter pins its role. If a role resolves to no available model, that seat runs on the parent session model; say so. If dropped seats leave fewer than two runners, add runners until there are two, or one when only one role is configured. Run each added runner on a remaining runner's agent, or omit `agent` so it runs on the parent model when none remain, and say so. Spawn more runners when the arena covers multiple design directions. Use the same agent N times when the work is generation-bound rather than judgment-sensitive. Pick each subagent's thinking level per the Subagents section of the **poteto-mode** skill.
 4. Give each candidate its own output location (an `isolated: true` task workspace where possible, otherwise `%TEMP%/arena-<slug>/candidate-<n>/` on Windows or `$TMPDIR/arena-<slug>/candidate-<n>/` elsewhere), per the **separate-before-serializing-shared-state** principle skill.
 
 ## Phase B: Fan out
@@ -25,11 +25,11 @@ If a candidate produces no output, proceed with N-1 and note the dropout.
 
 ## Phase C: Cross-judge
 
-After all Phase B candidates complete, spawn one read-only judge subagent on `agent: "pstack-judge"` (`@pstack-judge`), preferring a model family different from the parent's. Say "do not edit files" in its brief and check `git status` after. It sees the rubric and the candidates by path label, scores each criterion, and recommends a base with rationale. It runs in parallel with your reading in Phase D. Don't spawn it while candidates are still writing.
+After all Phase B candidates complete, spawn one read-only judge subagent. The judge is never from the parent's family. Try `pstack-panel` first, then `pstack-judge`, and use only a role that resolves to a family other than the parent's. An inherit-parent role is the parent model, so it never judges. If you do not know the parent's model, try the two real roles in order and say that the family check did not run. If no role from another family runs, skip the judge, pick the base alone in Phase D, and say so. Say "do not edit files" in its brief and check `git status` after. It sees the rubric and the candidates by path label, scores each criterion, and recommends a base with rationale. It runs in parallel with your reading in Phase D. Don't spawn it while candidates are still writing.
 
 ## Phase D: Pick a base
 
-Read every candidate end to end before picking. Score each against the rubric criterion by criterion, not on holistic feel, and compare with the cross-judge. Agreement on the base confirms the pick. Disagreement means one of you is biased or the rubric was ambiguous. Read both rationales before deciding.
+Read every candidate end to end before picking. Score each against the rubric criterion by criterion, not on holistic feel, and compare with the cross-judge when Phase C ran one. Agreement on the base confirms the pick. Disagreement means one of you is biased or the rubric was ambiguous. Read both rationales before deciding.
 
 Pick the base a future maintainer can extend most easily without breaking invariants. When two feel tied, prefer the cleaner boundary or smaller API, per the Laziness Protocol.
 
@@ -45,4 +45,4 @@ Verify the synthesized artifact like any other output, per the **prove-it-works*
 
 ## Outputs
 
-One synthesized artifact, with a short synthesis note alongside naming the base and why, the cross-judge's verdict, each graft with its source candidate, what was rejected and why, any convergence or dropouts, and the verification result.
+One synthesized artifact, with a short synthesis note alongside naming the base and why, the cross-judge's verdict or that Phase C skipped the judge, each graft with its source candidate, what was rejected and why, any convergence or dropouts, and the verification result.

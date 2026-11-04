@@ -1,26 +1,36 @@
 {
-  "$comment": "上游源码不进 git：由 tools/upstream/sync.mjs 按这里的 pin 拉取到 .upstream/（已 gitignore）。升级上游时先改这里，再逐 port 重跑 tools/fidelity；不要在各 port 文档里另写版本号。",
+  "$comment": "上游源码不进 git：由 tools/upstream/sync.mjs 按这里的 pin 拉取到 .upstream/（已 gitignore）。sources 里既有移植基线，也有只读参考快照，role 字段写明用途。升级上游时先改这里的基线，再逐 port 重跑 tools/fidelity；不要在各 port 文档里另写版本号。",
   "sources": {
     "cursor-plugins": {
       "role": "pstack 英文原文，所有 port 的保真基线",
       "repo": "https://github.com/cursor/plugins.git",
       "subdir": "pstack",
-      "version": "0.15.32",
-      "commit": "99b609a72323b70204eab407c622f436e858e112",
-      "commitDate": "2026-10-24",
+      "version": "0.15.36",
+      "commit": "fd268b808c786469e6dd8c8d9db864d0de4d669e",
+      "commitDate": "2026-11-03",
       "license": "MIT",
       "checkout": ".upstream/cursor-plugins",
       "sparse": ["pstack"]
     },
-    "pstack-zcode": {
-      "role": "ChHsiching 的 pstack→ZCode 现成移植（git subtree 跟上游 cursor/plugins）；只作为审核对照快照存在于 .upstream/，不进 git，不是任何 port 的移植基线",
-      "repo": "https://github.com/ChHsiching/pstack-zcode.git",
-      "version": "0.15.32",
-      "commit": "9c64e3af5bbf80e1bb98fa1f61a40b8ddce5557e",
-      "commitDate": "2026-10-25",
+    "pstack-claude": {
+      "role": "michael-denyer 的 pstack→Claude Code 社区移植（自身 0.9.103，跟踪上游 pstack 0.15.32 @ e73df47）；只作为审核对照快照存在于 .upstream/，不进 git，不是任何 port 的移植基线",
+      "repo": "https://github.com/michael-denyer/pstack-claude.git",
+      "version": "0.9.103",
+      "commit": "36885ea631d2afd9482cf9333cc4bbc829b3b02d",
+      "commitDate": "2026-10-26",
       "license": "MIT",
-      "checkout": ".upstream/pstack-zcode",
-      "sparse": []
+      "checkout": ".upstream/pstack-claude",
+      "sparse": ["plugins/pstack", "tools", "docs", "tests"]
+    },
+    "open-pstack": {
+      "role": "ericlitman 的 pstack→Claude Code/Codex 社区移植（自身 1.16.0，跟踪上游 pstack 0.15.29 @ 88d4751）；模型/provider registry 与运行时测试可作设计参考；只作为审核对照快照存在于 .upstream/，不进 git，不是任何 port 的移植基线",
+      "repo": "https://github.com/ericlitman/open-pstack.git",
+      "version": "1.16.0",
+      "commit": "b4c5e3d63318308b7e11f26b2bc156e7793d834a",
+      "commitDate": "2026-10-22",
+      "license": "MIT",
+      "checkout": ".upstream/open-pstack",
+      "sparse": ["plugins/pstack", "docs", "tests", ".claude"]
     },
     "pstack-zh": {
       "role": "pstack 中文译文底稿；只作为阅读快照存在于 .upstream/，不进 git，不是任何 port 的移植基线",
@@ -41,7 +51,7 @@
   },
   "fidelity": {
     "upstreamPath": ".upstream/cursor-plugins/pstack",
-    "changedLinesBaseline": "776 / 24644",
+    "changedLinesBaseline": "721 / 29113",
     "scripts": "tools/fidelity"
   }
 }

@@ -4,3 +4,5 @@
 *.bash text eol=lf
 *.mjs  text eol=lf
 *.ts   text eol=lf
+# Extensionless launch scripts have no suffix rule; cover the scripts trees too.
+pstack-*/skills/*/scripts/** text eol=lf

@@ -58,7 +58,7 @@ This plugin's skills never name a raw model. They name *roles*, and each role is
 | --- | --- | --- | --- |
 | fast worker (was `grok-4.7-xhigh-fast`) | `pstack-worker.md` | `@pstack-fast` | code delegates, explorers, investigators, swarm workers |
 | judge (was `claude-opus-5-5-xhigh`) | `pstack-judge.md` | `@pstack-judge` | explainers, synthesizers, reviewers, prose and judgment |
-| extra panel seat | `pstack-panel.md` | `@pstack-panel` | second model family for arena runners / interrogate reviewers when configured |
+| extra panel seat | `pstack-panel.md` | `@pstack-panel` | second model family for arena runners and interrogate reviewers, and the preferred arena cross-judge, when configured |
 
 `/skill:setup-pstack` configures what these roles resolve to by writing `modelRoles.pstack-fast` / `pstack-judge` / `pstack-panel` in `~/.omp/agent/config.yml`. Defaults if unconfigured: the roles resolve to the parent session's active model (all three unset), which matches `inherit-parent`. Panel diversity then comes only from what the user configured.
 
@@ -99,6 +99,7 @@ Follow the skill's steps with these changes:
 | `.cursor/skills/`, `~/.cursor/skills/` | this plugin is installed via `omp plugin link <pstack>` or marketplace; skills live under its `skills/`. For project-local skills: `.omp/skills/<name>/SKILL.md`; user: `~/.omp/agent/skills/<name>/SKILL.md`. |
 | `~/.cursor/rules/pstack-models.mdc` | `modelRoles` in `~/.omp/agent/config.yml` (see Models). |
 | `~/.cursor/projects/<slug>/agent-transcripts/<uuid>/<uuid>.jsonl` | `~/.omp/agent/sessions/<encoded-cwd>/<timestamp>_<sessionId>.jsonl`. `<encoded-cwd>` is derived from the canonical cwd: `-<relative>` under the home directory, `-tmp-<relative>` under the temp root, `--<encoded-absolute>--` otherwise, path separators as `-`. `D:/work/pstack-ports` becomes `--D--work-pstack-ports--`. Every line is one session entry; the newest `.jsonl` directly in that folder is the most recent session. Subagent transcripts are `<AgentName>.jsonl` files in the session's artifacts tree, read via `history://<id>`. Read only the current workspace's bucket. |
+| Cursor Project tracker / Project store | the agent store at `orchestrate/<slug>/`, outside the repo, with `notes.md` as the tracker |
 | `https://github.com/cursor/plugins/blob/main/pstack/<path>` | `<pstack>/<path>` in this plugin for everything the plugin ships. `README.md`, `docs/guide/`, and `docs/harness/claude-code.md` are not shipped: cite them as upstream references and never treat them as this plugin's omp behavior. Read the local copy, never fetch it. Give the user the URL when they need a link. |
 | `/tmp/arena-<slug>/candidate-<n>/` | `$TMPDIR` or `%TEMP%` path with the same shape; or a git worktree when one is available. |
 | `.cursor/worktrees/` | `task` isolation workspaces (branch mode `omp/task/<id>`) or plain `git worktree` commands. |
