@@ -1,71 +1,40 @@
 # pstack-ports
 
-pstack 是 Lauren Tan（poteto）为 Cursor 写的一套工程方法论：58 个 skill、23 个 playbook、24 条原则、2 个子代理，核心是 `/poteto-mode`。它的价值不在某个平台的 API，而在**流程与原则**——所以它可以被搬走。
+基于 [cursor/plugins 的 pstack](https://github.com/cursor/plugins/tree/main/pstack)（当前锁定 `0.15.36` @ `fd268b8`，MIT）重建的**高质量中文精译与 `omp`（oh my pi）中文版适配仓库**。
 
-本仓库是 pstack 跨 agent harness 适配的**统一存放处**。每适配一个平台，这里多一份可安装的产物、一份平台差异清单、一次保真验证；方法本身沉淀成一份可复用指南。
+## 为什么推翻重来
 
-- 上游：`cursor/plugins` 的 `pstack`，v0.15.36（commit `fd268b8`），MIT。基线锁定在 [`UPSTREAM.json`](UPSTREAM.json)。
-- 方法：[`PORTING-GUIDE.md`](PORTING-GUIDE.md)（六步流程 + 十条教训）。
-- 状态：[`docs/status.md`](docs/status.md)（唯一状态源，含每个产物的验证方式）。
+旧版直接从英文原文改写成英文版 `pstack-omp`，且尝试覆盖多个能力参差不齐的 harness（Kimi Code、DSH 等），导致两个核心问题：
 
-## 产物矩阵
+1. 缺乏一版专业、地道、去翻译腔与 AI 腔的中文方法论底座，很难直接通读吃透原版，也难以判断适配版究竟改了什么。
+2. 多平台静态副本维护成本高，而部分 harness 并不具备支撑 pstack 多代理隔离与验证闭环的能力。
 
-| 目录 | 目标 | 状态 | 读哪里 |
-| --- | --- | --- | --- |
-| [`pstack-omp/`](pstack-omp/) | omp | ✅ 完成，可经 marketplace 分发 | [`ADAPTATION.md`](pstack-omp/ADAPTATION.md)、[`docs/harness/omp.md`](pstack-omp/docs/harness/omp.md) |
-| [`pstack-dsh/`](pstack-dsh/) | DeepSeek Harness | ⏸ 暂停（2026-10-25） | [`README.md`](pstack-dsh/README.md)、[`RESEARCH-prior-art.md`](pstack-dsh/RESEARCH-prior-art.md) |
-| [`pstack-kimi/`](pstack-kimi/) | Kimi Code | ⏸ 暂停（2026-10-24） | [`README.md`](pstack-kimi/README.md) 首段、[`docs/harness/kimicode.md`](pstack-kimi/docs/harness/kimicode.md) |
+本次重构聚焦一条主线：
 
-中文自读版不是产物，只存在于 `.upstream/pstack-zh/`（`sync.mjs` 拉取，gitignored），不占仓库目录。
-
-## 怎么读
-
-- **想装来用**：看目标平台的产物目录，omp 走 [`pstack-omp/ADAPTATION.md`](pstack-omp/ADAPTATION.md) 的分发章节；dsh 已暂停、暂不可装。
-- **想理解 pstack 本身**：读 `.upstream/cursor-plugins/pstack/` 英文原文，或 `.upstream/pstack-zh/` 的中文译文（先跑 `node tools/upstream/sync.mjs`；译文停在 0.15.29，`statechart`、`ketchup-video` 只有英文）。
-- **想对照别人的 Claude Code 移植**：读 `.upstream/pstack-claude/`（michael-denyer，0.9.103）与 `.upstream/open-pstack/`（ericlitman，1.16.0）。两者只是参考快照，不是本仓库的移植基线。
-- **想读懂移植怎么做**：[`PORTING-GUIDE.md`](PORTING-GUIDE.md)。
-- **想新增一个平台**：先读 [`docs/README.md`](docs/README.md) 的文档地图，再按 PORTING-GUIDE 的六步走。
+1. **阶段一 · 中文原版底座（`pstack-zh/`）**：先依据英文原文逐字核校术语与语境，做出地道、克制、无翻译腔的中文版 `pstack`（含完整 `docs/guide/` 与全部 `skills/`）。
+2. **阶段二 · `omp` 中文适配版（`pstack-omp/`）**：以 `pstack-zh/` 为根基派生中文版 `omp` 插件，使所有 skill、playbook 与适配改动都可用中文直接审计 diff。
 
 ## 目录结构
 
-按职责分四层，不要混用：
+| 路径 | 用途 |
+| --- | --- |
+| [`UPSTREAM.json`](UPSTREAM.json) | 上游基线版本锁（`0.15.36` @ `fd268b8`）与参考源定义 |
+| `GLOSSARY.md` | 统一术语表与中文行文规范（待建） |
+| [`.upstream/`](tools/upstream/sync.mjs) | 只读上游快照（gitignored），由 `node tools/upstream/sync.mjs` 拉取 |
+| [`docs/omp-platform-notes.md`](docs/omp-platform-notes.md) | 从 v1 归档打捞的 `omp` 实测平台事实与避坑备忘 |
+| [`tools/`](tools/) | 上游同步脚本、引用/结构校验脚本与打捞的 `omp` 辅助脚本 |
+| `pstack-zh/` | 阶段一产物：忠于原版的中文版 `pstack`（待建） |
+| `pstack-omp/` | 阶段二产物：基于 `pstack-zh/` 的中文版 `omp` 插件（待建） |
 
-| 层 | 路径 | 放什么 | 不该放什么 |
-| --- | --- | --- | --- |
-| 仓库层 | `README.md`、`UPSTREAM.json`、`docs/status.md` | 总入口、上游 pin、状态矩阵 | 单个平台的映射细节 |
-| 方法层 | `PORTING-GUIDE.md`、`tools/fidelity/` | 可复用的流程与脚本 | 与某个平台绑定的命令、一次性证据 |
-| 依赖层 | `.upstream/`（gitignored） | 上游原文快照、参考移植快照与中文译文快照，由 `tools/upstream/sync.mjs` 按 `UPSTREAM.json` 的 pin 拉取 | 手改；提交进 git |
-| 产物层 | `pstack-<platform>/` | 自包含、可直接分发的插件包：`skills/`、`agents/`、平台清单、包内映射表与决策记录 | 仓库级索引 |
+> 之前的 v1 尝试（原英文 `pstack-omp`、`pstack-kimi`、`pstack-dsh`、`pstack-claude` 研读笔记）已完整封存在本地归档分支 `archive/v1-attempts`。
 
-产物层每个目录都**自包含**：它要能被单独打包分发，所以允许与其它 port 重复（`skills/` 是逐份副本）。重复是交付形态，不是结构问题；差异靠 `tools/fidelity` 对照上游量化。
-
-## 保真与验证
-
-上游原文不进 git。首次使用先按 [`UPSTREAM.json`](UPSTREAM.json) 的 pin 拉取到 `.upstream/`：
-
-```bash
-node tools/upstream/sync.mjs        # 拉到 pin；加 --check 只报告上游有多少新提交
-```
-
-移植的质量判断不靠感觉，靠三个只读脚本（用法见 [`tools/fidelity/README.md`](tools/fidelity/README.md)，`--upstream` 已有默认值）：
+## 常用命令
 
 ```bash
-python tools/fidelity/diff_bundle.py --port pstack-<platform> --subdir skills --out %TEMP%/fidelity
-python tools/fidelity/check_port.py --port pstack-<platform> --allow url
-python tools/fidelity/outline_compare.py --port pstack-<platform> --subdir skills
+node tools/upstream/sync.mjs          # 按 UPSTREAM.json 拉取 .upstream/ 对照源
+node tools/upstream/sync.mjs --check  # 检查上游在 pin 之后是否有新提交
 ```
-
-`check_port.py` 的 `problems 0` 与 `outline_compare.py` 的 `failures 0` 是硬闸门；改动行数只是定位信号。运行侧验证只做一次、结论进 [`docs/status.md`](docs/status.md)，脚本与证据不常设入库。
-
-## 新增一个平台的最小动作
-
-1. 更新 [`UPSTREAM.json`](UPSTREAM.json)（只在升级上游时）。
-2. 建 `pstack-<platform>/`，先写 `docs/harness/<platform>.md` 平台差异清单，再动 skill 正文。
-3. 迁入上游原稿作基线，按文件机械改写，跑禁词扫描。
-4. 跑 `tools/fidelity` 三个脚本，两个硬闸门清零。
-5. 按语义切片做语义审查（四分类 rubric，两端原文引用）。
-6. 装一次、真实调用一次；只把结论写进 [`docs/status.md`](docs/status.md)，一次性脚本与证据不入库。
 
 ## 许可
 
-上游 pstack 归 Lauren Tan，MIT。各产物的 `LICENSE` 随目录分发；本仓库的移植层与文档沿用同一许可。
+上游 `pstack` 归 Lauren Tan（poteto），采用 MIT 许可；本仓库的译文与适配层沿用 MIT 许可。
