@@ -1,13 +1,13 @@
 {
-  "$comment": "上游源码不进 git：由 tools/upstream/sync.mjs 按这里的 pin 拉取到 .upstream/（已 gitignore）。sources 里既有移植基线，也有只读参考快照，role 字段写明用途。升级上游时先改这里的基线，再逐 port 重跑 tools/fidelity；不要在各 port 文档里另写版本号。",
+  "$comment": "上游源码不进 git：由 tools/upstream/sync.mjs 按这里的 pin 拉取到 .upstream/（已 gitignore）。cursor-plugins 锁定本仓库的英文原版基线；其余三项为只读参考快照。",
   "sources": {
     "cursor-plugins": {
       "role": "pstack 英文原文，所有 port 的保真基线",
       "repo": "https://github.com/cursor/plugins.git",
       "subdir": "pstack",
-      "version": "0.15.36",
-      "commit": "fd268b808c786469e6dd8c8d9db864d0de4d669e",
-      "commitDate": "2026-11-03",
+      "version": "0.15.42",
+      "commit": "bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7",
+      "commitDate": "2026-11-14",
       "license": "MIT",
       "checkout": ".upstream/cursor-plugins",
       "sparse": ["pstack"]
@@ -51,7 +51,6 @@
   },
   "fidelity": {
     "upstreamPath": ".upstream/cursor-plugins/pstack",
-    "changedLinesBaseline": "721 / 29113",
     "scripts": "tools/fidelity"
   }
 }

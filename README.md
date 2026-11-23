@@ -1,6 +1,6 @@
 # pstack-ports
 
-基于 [cursor/plugins 的 pstack](https://github.com/cursor/plugins/tree/main/pstack)（当前锁定 `0.15.36` @ `fd268b8`，MIT）重建的**高质量中文精译与 `omp`（oh my pi）中文版适配仓库**。
+基于 [cursor/plugins 的 pstack](https://github.com/cursor/plugins/tree/main/pstack)（当前锁定 `0.15.42` @ `bf0c7cd`，MIT）重建的**高质量中文精译与 `omp`（oh my pi）中文版适配仓库**。
 
 ## 为什么推翻重来
 
@@ -18,11 +18,11 @@
 
 | 路径 | 用途 |
 | --- | --- |
-| [`UPSTREAM.json`](UPSTREAM.json) | 上游基线版本锁（`0.15.36` @ `fd268b8`）与参考源定义 |
-| `GLOSSARY.md` | 统一术语表与中文行文规范（待建） |
+| [`UPSTREAM.json`](UPSTREAM.json) | 上游基线版本锁（`0.15.42` @ `bf0c7cd`）与参考源定义 |
+| [`GLOSSARY.md`](GLOSSARY.md) | 统一术语表、一词多义分译表与中文行文规范 |
 | [`.upstream/`](tools/upstream/sync.mjs) | 只读上游快照（gitignored），由 `node tools/upstream/sync.mjs` 拉取 |
 | [`docs/omp-platform-notes.md`](docs/omp-platform-notes.md) | 从 v1 归档打捞的 `omp` 实测平台事实与避坑备忘 |
-| [`tools/`](tools/) | 上游同步脚本、引用/结构校验脚本与打捞的 `omp` 辅助脚本 |
+| [`tools/`](tools/) | 上游同步脚本与引用/结构校验脚本 |
 | `pstack-zh/` | 阶段一产物：忠于原版的中文版 `pstack`（待建） |
 | `pstack-omp/` | 阶段二产物：基于 `pstack-zh/` 的中文版 `omp` 插件（待建） |
 

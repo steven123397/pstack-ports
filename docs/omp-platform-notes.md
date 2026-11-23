@@ -56,9 +56,8 @@
   - `~/.omp/agent/sessions/<encoded-cwd>/<timestamp>_<sessionId>.jsonl`。
   - `<encoded-cwd>` 编码规则：home 下相对路径为 `-<rel>`，temp 下为 `-tmp-<rel>`，其余为 `--<abs>--`，路径分隔符统一转为 `-`（如 `D:/codex_project/pstack-ports` → `--D--codex_project-pstack-ports--`）。
   - 子代理记录可直接用 `history://<id>` 读取，无需手工解析 JSONL。
-- **云端 Worker（Jules 适配器）**：
-  - 旧版封装已保存在 [`tools/omp/jules-cloud.mjs`](../tools/omp/jules-cloud.mjs)，走 Jules REST API（依赖 `JULES_API_KEY` 与已授权 GitHub 仓库）。
-  - 已知特性：Jules CLI 的 `--session` 参数会在 `#` 截断，传长 prompt 必须走文件或 stdin；API 无 cancel 端点；只读会话答完后可能长期停留 `IN_PROGRESS`，应通过 `result` / `activities` 读结果而非死等 `COMPLETED`。
+- **云端 Worker（待另寻方案）**：
+  - 原 v1 尝试过的 Jules REST 方案已关停，对应脚本已从仓库移除。未来重建 `pstack-omp` 时，本地并行隔离用 `isolated: true`；若需要跨机器持久云端 worker，需届时另选替代方案。
 - **Cursor 专属能力处理**：
   - `automations/`（benny）与 Bugbot 在 omp 无等价物。保留流程步骤时可采用单行跳过约定（如在回复注明原因后继续）；GitHub PR 上的其他人类或 bot 评审线程仍正常按规则分诊。
 - **Windows 与 `statechart` / 测试环境**：
