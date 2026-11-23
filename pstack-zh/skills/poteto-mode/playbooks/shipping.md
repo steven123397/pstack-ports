@@ -1,0 +1,12 @@
+### Shipping
+
+**最终合进主干的东西归你把关。先独立验证每个 PR，只从栈底起合入连续验证通过的一段，合入期间手别乱碰栈结构。**
+
+1. **先判定代码托管平台，再在合入前对每个 PR 做独立验证。** 默认用 GitHub CLI（`gh`）；如果 `command -v origin` 成功且 Origin 能解析当前仓库，所有 PR 操作一律用 `origin pr`。否则留在 `gh` 并记录回退，不要依赖 Graphite（`gt`）。每个 PR 单派一名云端验证代理，用对应的 control `skill`（例如 `cursor-team-kit` 里的 `control-ui` 或 `control-cli`），像真实用户那样把 parent 和 head 对照跑一遍，并在该 PR 上贴出 `PASS`、`PASS+NOTES` 或 `FAIL`。只有**没写过这段代码**的代理给出的判定才算数，因为写代码的作者只会验它「以为自己写出来的东西」。CI 全绿或机器人点批准都不算验证判定，因为它们都不会像真实用户那样跑一遍改动。
+2. **只合入从栈底起连续验证通过的那一段序列。** 从最底端第一个未合入的 PR 往上数，碰到第一个没有拿到 `PASS` 或 `PASS+NOTES` 的就停。它下面那一整串就是本次可合入序列（verified run），最顶上那个是可合入上限（ceiling）。排在未验证 PR 上面的 PR 就算自己已经验过也得等着，因为它依赖底下的代码没法单独落地。如果上面某个分支既不包含也不依赖底下的代码，可以把它挪到主干上单独合入，但挪完必须拿一份全新的验证判定，因为旧判定是在底下那份代码存在时跑出来的，而主干里并没有它。
+3. **复核旧判定是不是还对应当前代码。** 判定绑定的是补丁内容，而链式 rebase 会把上层每个 PR 都移到新 SHA（哪怕检查没挂）。信任旧判定之前，先拿判定时的 SHA 和当前 head 对比 `git patch-id`。如果两份补丁只在测试、文档或 lint 配置上有差异，只要某条检查通道（lane）实际运行的东西在两个 SHA 下构建出的产物除噪声外完全一致，该通道的旧结果依然有效（所谓噪声，是指对判定 SHA 连续构建两次也会出现的差异，或内嵌的 commit SHA）。把每种噪声连同涉及的文件报出来，方便评审人核查这个判断。不过新增或改动过的测试/文档/配置本身仍需跑新检查并接受审查，因为旧判定从未见过它。如果某条通道没有可对比的构建产物（比如直接起 dev server），就无法靠这招证明，必须重跑，其他发生漂移的通道也一律重验。
+4. **从底向上，一次合入一个 PR。** 始终合入序列里最底端那个未合 PR，执行 `origin pr merge <pr>` 或 `gh pr merge <pr> --squash`。注意在 Origin 上普通 merge 命令会把指定 PR 底下的所有 PR 一并合掉；而在 GitHub 上，如果 PR 的 base 还指着父分支，合入后会合进父分支而不是主干。合完必须回读确认真实结果（`origin pr view <pr>` 或 `gh pr view <pr> --json state,mergedAt,baseRefName`），因为命令返回成功可能只是排进了 merge queue，而开了 auto-merge 也不等于已经合入。真正落地合入的 PR，回读时状态必须是 merged 且 base 指向主干分支，不是父分支。只有当前 head 明确被有效判定覆盖的 PR，才允许开启 `--auto`（Origin merge-when-ready 或 GitHub auto-merge），因为它一旦就绪就会把当时的 head 直接合掉。父 PR 落地后，把原先以它为 base 的子 PR 改指向主干（`origin pr edit <pr> --base <trunk>` 或 `gh pr edit <pr> --base <trunk>`），把它的补丁挪到最新合入结果之上，并用 `--force-with-lease` 推送。判定覆盖的是补丁内容而非 commit SHA，因此按第 3 步的 `patch-id` 规则判断旧判定是否依然有效；确认检查通过且判定仍有效后，再合入它。
+5. **合入推进期间别乱动 PR 栈。** 整个合入过程里，唯一允许改分支或改 base 的动作就是第 4 步把下一个 PR 迁到主干上，因为合并动作不管三七二十一，分支和 base 当下是什么就会合什么。在 GitHub 上，挂在 `/loop` 里用 `playbooks/babysit.md` 的队列 watcher（`scripts/watch-pr/watch-pr --queued-stack --stack-prs <从底到顶的列表>`）一直盯到上限 PR 报 `COMPLETE`。在 Origin 上，每次 `origin pr checks <pr> --watch` 返回后用 `origin pr view <pr> --checks` 重读当前 PR，直到上限 PR 状态变为 merged。父 PR 合入后子 PR 的 base 自动切到主干属于预期行为，别当成异常去修。如果合入卡住，先查明原因再动任何东西。
+6. **合到上限 PR 就停手。** 想把可合入序列再往上推，必须拿新的验证判定，也就是从第 1 步重新来一轮。
+
+**Reply：** 连续验证通过的序列及其上限 PR、每个 PR 的判定结果和验证代理、实际已合入的 PR 及回读确认方式，以及下一个断链缺口需要补什么。
