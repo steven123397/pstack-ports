@@ -27,7 +27,7 @@ flowchart TD
 
 上图只画了最常用的几条路。除此之外，插件里还备齐了针对单指标迭代优化（`Hillclimb`）、活进程或性能产物取证（`Runtime forensics` / `Trace forensics`）、低成本原型比选（`Prototype`）、像素级 UI 对齐（`Visual parity`）、编写与盲测 `skill`（`Authoring a skill` / `Eval`）、无人值守长跑（`Autonomous run`）、开 PR 与盯盘护航（`Opening a PR` / `Babysit`）、叠栈 PR 合入主干（`Shipping`）、队列或叠栈全自动推进（`Autopilot-full` / `Autopilot-stack`）、项目级协调编排（`Orchestrate`）、断点续接与安全挂起（`Session pickup` / `Pause safely`）、多阶段计划（`Multi-phase plan`）以及清理 `worktree`（`Worktree cleanup`）的 `playbook`。完整清单见 [playbook 目录](../../skills/poteto-mode/playbooks/)。
 
-## 直接说目标，别搞虚礼
+## 直接说目标，省去繁琐形式
 
 你不需要先写一份正经八百的规格说明书。直说哪里坏了、想做成什么样，再顺手带上你已经知道的线索，帮代理省去瞎找的时间就行：
 
@@ -72,7 +72,7 @@ flowchart TD
 /sharpen 给 v2 配置格式写一份迁移指南。
 ```
 
-代理会先点出四件事：这个领域的顶尖专家会额外做哪些你没提的动作、他们会从哪份最原始的材料看起、会动用什么具体方法和工具，以及除了你和代理之外还有什么客观依据能证明结果是对的。然后它会把你的 `prompt` 重写一遍，挖得更深、但盘子不铺大。重写后的 `prompt` 还会要求代理：凡是能靠跑实验定下来的分叉，先做原型观察再推荐方案；只有实验定不了的产品或偏好取舍，才留给你拍板。`/sharpen` 本身不会直接开工。你看完改好的 `prompt` 觉得合适，再配上 `/poteto-mode` 发出去就行。
+代理会先点出四件事：这个领域的顶尖专家会额外做哪些你没提的动作、他们会从哪份最原始的材料看起、会动用什么具体方法和工具，以及除了你和代理之外还有什么客观依据能证明结果是对的。然后它会把你的 `prompt` 重写一遍，挖得更深，但不扩大任务范围。重写后的 `prompt` 还会要求代理：凡是能靠跑实验定下来的分叉，先做原型观察再推荐方案；只有实验定不了的产品或偏好取舍，才留给你拍板。`/sharpen` 本身不会直接开工。你看完改好的 `prompt` 觉得合适，再配上 `/poteto-mode` 发出去就行。
 
 ## 上下文有了，后续指令越短越好
 
