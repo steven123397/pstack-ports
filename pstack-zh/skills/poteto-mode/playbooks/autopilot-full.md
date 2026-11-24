@@ -5,7 +5,7 @@
 一份判定只覆盖对应的那份补丁，全绿 CI 只覆盖对应的那个 head。第 4 步只跑一次完整 `swarm`，只有在出现重大改动时才重跑整组。`playbooks/shipping.md` 里的 `patch-id` 规则可以延续未变通道的结果，但每个新 head 仍须拿到自己的全绿 CI。
 
 1. **操作者划定的卡点优先级最高。** 全自动授权只覆盖本队列内的事项，凡是操作者点名归他自己管的项以及队列之外的 PR，一律走到已就绪可合入就停手。用户让你先汇报计划，绝不等于已经放行开干。
-2. **每个 PR 派一名主理代理，并把它的进度留在接替者找得到的地方。** 整项任务开头一次性判定代码托管平台：默认 GitHub CLI（`gh`）；如果 `command -v origin` 成功且 Origin 能解析当前仓库，所有 PR 操作一律用 `origin pr`，否则留在 `gh` 并记录回退，绝不依赖 Graphite（`gt`）。每名主理代理都是一个 Cursor 云端代理，负责写代码、按 `playbooks/opening-a-pr.md` 开 PR、在真实产物上自证效果、按 `playbooks/babysit.md` 盯盘跑绿，等第 4 步和第 5 步放行后自行合入。
+2. **每个 PR 派一名主理代理，并把它的进度留在接替者找得到的地方。** 整项任务开头一次性判定代码托管平台：默认 GitHub CLI（`gh`）；如果 `command -v origin` 成功且 Origin 能解析当前仓库，所有 PR 操作一律用 `origin pr`，否则留在 `gh` 并记录回退，绝不依赖 Graphite（`gt`）。每名主理代理都是一个 Cursor 云端代理，负责写代码、按 `playbooks/opening-a-pr.md` 开 PR、在真实产物上自证效果、按 `playbooks/babysit.md` 盯盘跑绿，等第 4 步和第 5 步放行后自行合入。凡是 `babysit.md` 要求上报 rebase 的地方，由主理代理自行 rebase 自己的分支，并用 `git push --force-with-lease` 推送。
 
    PR 要早点开出来，好让 CI 和机器人同步跟着跑。只有先过完 `cursor-team-kit` 里的 `/deslop` 清理和 `/no-comments` 审查，才算代码就绪（code-ready），这样完整验证 `swarm` 跑在的是成品代码上。接着 rebase 到最新主干，在自证之前先上报 code-ready head，确保验证跑在真正要落地的基线上。之后每次有新 head 都要上报，等自证、CI 和 `Babysit` 全过后再报 merge-ready。修 review 或修 bug 的轮次尽量留在同一个 base 上，除非主干冲突、把 CI 弄红，或有人往相同文件合入了已知并发改动，因为每次 rebase 都会重启整套 CI。在推送 code-ready 以及后续需要重新验证的推送之前，务必在已提交的 head 上先跑完触及路径对应的仓库检查。
 

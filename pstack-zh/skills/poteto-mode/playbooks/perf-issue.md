@@ -14,7 +14,7 @@
    7. 换更省开销的做法。
 
    前面哪一条已经达标，就在那里停手。
-3. 基于 trace 规划修复。如果改动跨越函数边界，先走 `architect`。把实现派给子代理，使用配置好的 `perf-issue` 模型（默认 `claude-opus-5-5-xhigh`），并按 `Subagents` 一节选好推理档位与速度。亲自审查 `diff`，再抓一份修复后的 trace。遵循 **sequence-verifiable-units** `principle`，每试完一个改动先验证，再试下一个。
+3. 基于 trace 规划修复。如果改动跨越函数边界，先走 `architect`。把实现派给子代理，使用配置好的 `perf-issue` 模型（默认 `claude-opus-5-5-xhigh-fast`），并按 `Subagents` 一节选好推理档位。亲自审查 `diff`，再抓一份修复后的 trace。遵循 **sequence-verifiable-units** `principle`，每试完一个改动先验证，再试下一个。
 4. 解析并对比前后产物（把 JSON 导进 sqlite 或做 diff）。报「结论未定（inconclusive）」或测错了端，一律不算通过，必须标出来。
 5. 把实测对比数据写进 PR 描述。
 6. 收尾执行 **Opening a PR**。

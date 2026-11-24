@@ -9,7 +9,7 @@
 3. 用 **show-me-your-work** `skill` 打开决策日志，记在 `decision.tsv` 里，每次尝试占一行：id、hypothesis、change、before、after、delta、tests、verdict（kept 或 reverted）、note。每开始新一轮尝试前先读一遍它。日志文件不提交进仓库（加入 gitignore）。
 4. 每条假设必须扎根在第 1 步摸出的架构模型里，点出具体作用机制（例如「把 X 移出启动路径，因为它卡住了首屏绘制」），别写「试试加个缓存」这种空话。如果是性能指标，按 `Perf issue` playbook（`playbooks/perf-issue.md`）第 2 步的七条性能口诀排序，只借它的尝试顺序，不借它的提前停止规则。
 5. 进入循环，每轮只验一条假设：
-   - 用配置好的 `hillclimb` 模型（默认 `claude-opus-5-5-xhigh`）把精确收口的小改动派给子代理，按 `Subagents` 一节挑好推理档位和速度。你负责监督和审 `diff`，别自己闷头敲代码（遵循 **guard-the-context-window** `principle`）。当手里有几条彼此独立的假设时，并行派给多个子代理，各自独占一个 `worktree`（遵循 **separate-before-serializing-shared-state** `principle`）。
+   - 用配置好的 `hillclimb` 模型（默认 `claude-opus-5-5-xhigh-fast`）把精确收口的小改动派给子代理，按 `Subagents` 一节挑好推理档位。你负责监督和审 `diff`，别自己闷头敲代码（遵循 **guard-the-context-window** `principle`）。当手里有几条彼此独立的假设时，并行派给多个子代理，各自独占一个 `worktree`（遵循 **separate-before-serializing-shared-state** `principle`）。
    - 用冻结好的 `harness` 测前后对比，并跑一遍回归门禁。
    - 只有当指标收益明确超过噪声且回归门禁保持全绿，才接受改动；否则全量回滚。任何「说不定有点用」的微调一律不留。
    - 每个被接受的优化单打一个 commit，只暂存你改过的文件（用 `git add <files>`，绝不用 `-A`）。不管留还是回滚，都往日志里记一行。
