@@ -19,7 +19,7 @@ disable-model-invocation: true
 
 1. 明确说出完成判定条件，以及这批工人最终要交回什么产物或报告。
 2. 选定编排形态：按分片切块覆盖、让 N 个工人拿完全相同的 `brief` 赛马，或者两者混用。凡是涉及赛马或混合形态，开派前先声明胜出规则是 `first pass`、`rank all` 还是 `best-of`。
-3. 从 `~/.cursor/rules/pstack-models.mdc` 的 `swarm workers` 行挑选工人模型。如果规则文件或该行缺失，默认用 `claude-opus-5-5-high-fast`。配成 `auto` 或 `inherit-parent` 时，省略 `model` 参数让工人沿用父会话模型。如果 `Task` 工具拒绝了某个 `slug`，回退到默认值并说明；如果连默认值也被拒绝，从报错信息里选同一家族最接近的合法 `slug`。如果是多模型赛马，提前写明每一路跑哪个模型。按 **poteto-mode** `skill` 的 Subagents 章节，为每个子代理选定匹配的推理档位与 fast/standard 速度。
+3. 从 `~/.cursor/rules/pstack-models.mdc` 的 `swarm workers` 行挑选工人模型。如果规则文件或该行缺失，默认用 `claude-opus-5-5-high-fast`。配成 `auto` 或 `inherit-parent` 时，省略 `model` 参数让工人沿用父会话模型。如果 `Task` 工具拒绝了某个 `slug`，回退到默认值并说明；如果连默认值也被拒绝，从报错信息里选同一家族最接近的合法 `slug`。如果是多模型赛马，提前写明每一路跑哪个模型。按 **poteto-mode** `skill` 的 Subagents 章节，为每个子代理选定匹配的推理档位。
 4. 需要写文件的工人，每人分配独占的可写输出位置。如果工人负责验证或压测特定 commit，每份 `brief` 都必须点名确切的 SHA；涉及性能测量的 `brief` 还要写清测量方法（采样次数、单次样本定义、交替顺序），并要求工人在结果里把 SHA 和方法原样记下来。
 
 ## Phase B：并行扇出

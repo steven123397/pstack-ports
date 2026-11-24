@@ -49,7 +49,7 @@ disable-model-invocation: true
 
 ## 用 `/poteto-mode` 开始一个任务
 
-`/poteto-mode` 会把任务匹配到一个 `playbook`，把步骤原样抄进待办清单，跑到对应步骤时自动调起其他 `skill`。跳过的步骤会留在清单里并写上 `skip: <原因>`。好 `prompt` 只写清目标和验收标准，不手列一串 `skill`（人手排顺序反而容易打乱或漏步）。帮用户措辞前先读 [`references/prompting.md`](references/prompting.md)，更多示例看 [指南第 2 篇](../../docs/guide/02-poteto-mode.md)。
+`/poteto-mode` 会把任务匹配到一个 `playbook`，把步骤原样抄进待办清单，跑到对应步骤时自动调起其他 `skill`。好 `prompt` 只写清目标和验收标准，不手列一串 `skill`（人手排顺序反而容易打乱或漏步）。帮用户措辞前先读 [`references/prompting.md`](references/prompting.md)，更多示例看 [指南第 2 篇](../../docs/guide/02-poteto-mode.md)。
 
 `/poteto-mode` 能不能跨轮常驻，取决于怎么启动它：
 
@@ -68,6 +68,7 @@ disable-model-invocation: true
 | 严谨完成任何非琐碎任务 | [`/poteto-mode`](../poteto-mode/SKILL.md) |
 | 开工前先核对代理有没有听懂自己的目标和问题 | [`/in-your-own-words`](../in-your-own-words/SKILL.md) |
 | 发 `prompt` 前把它改得更深入（但不扩大任务范围）：补上顶尖专家会多做的事、原始材料、方法工具和外部客观校验；只交回重写后的 `prompt`，不直接干活 | [`/sharpen`](../sharpen/SKILL.md) |
+| 学习自己正在构建之物的专业术语（含从邻近领域借来的词，每条引用出处都经核实），并用新术语重写需求描述 | [`/reframe`](../reframe/SKILL.md) |
 | 搞懂现有代码怎么运作，或者新代码该放哪一层 | [`/how`](../how/SKILL.md) |
 | 查清代码当初为什么这么设计，或者某个数字从哪来的 | [`/why`](../why/SKILL.md) |
 | 用大白话彻底搞懂一项改动或一个子系统 | [`/teach`](../teach/SKILL.md) |
@@ -106,16 +107,15 @@ disable-model-invocation: true
 
 - `/how` 讲代码现在怎么跑，`/why` 讲当初为什么这么写，`/teach` 跑其中一个或两个再给你讲透。
 - `/arena` 让所有工人拿同一份 `brief` 比拼，选基底再嫁接优点；`/swarm` 拆片覆盖或赛马，汇总成一份报告。
-- `/architect` 定完设计后默认直接动手实现；想先过一眼设计再写代码，加上「带 checkpoint（with checkpoint）」。
 - `/interrogate` 审的是当前 `diff` 本身；`/blast-radius` 查的是 `diff` 之外可能被波及的地方，并实跑证明安全前提。
 - `/recall` 跨近期多次对话拼上下文；`/ketchup` 只覆盖当前对话自你上一条消息以来的变化；接手某一场具体对话或分支走 `Session pickup` playbook。
-- `/figure-it-out` 用来定制单次严谨长跑；`Orchestrate` playbook 管跨多天、多叠栈 PR 的大项目；`Autonomous run` playbook 负责把单个任务盯死完成条件一路跑完。
+- `/figure-it-out` 用来定制单次严谨长跑；`Autonomous run` playbook 负责把单个任务盯死完成条件一路跑完。
 
 不在 `pstack` 本包里的项：
 
 - `/deslop`、`control-cli` 和 `control-ui` 来自 `cursor-team-kit` 插件。
 - `/loop` 和 `/create-skill` 是 Cursor 内置功能。
-- `pstack` 没有 `/orchestrate` 这个斜杠 `skill`，`Orchestrate` 是 `/poteto-mode` 里的一个 `playbook`。如果 `/` 菜单里冒出 `/orchestrate`，那是别的插件提供的。
+- `pstack` 没有 `/orchestrate` 这个斜杠 `skill`。如果 `/` 菜单里冒出 `/orchestrate`，那是别的插件提供的。
 
 ## `playbook` 和 `principle`
 
@@ -128,7 +128,7 @@ disable-model-invocation: true
 - 「full autopilot on this queue」「这条队列跑全自动」→ `Autopilot-full`；「autopilot, don't merge」「全自动但别合」→ `Autopilot-stack`。
 - 「run the eval playbook」「跑一遍 eval playbook」→ `Eval`。
 
-不挂 `/poteto-mode` 直接说「babysit this pr」时，可能会误触发 Cursor 自带的同名技能。全部 `playbook` 及其适用场景列在 [`poteto-mode`](../poteto-mode/SKILL.md) 的 Playbooks 一节；开 PR、盯盘和合入的完整流程见 [指南第 6 篇](../../docs/guide/06-verify-and-ship.md)。
+不挂 `/poteto-mode` 直接说「babysit this pr」时，可能会误触发 Cursor 自带的同名技能。全部 `playbook` 列在 [`poteto-mode`](../poteto-mode/SKILL.md) 的 Playbooks 一节；开 PR、盯盘和合入的完整流程见 [指南第 6 篇](../../docs/guide/06-verify-and-ship.md)。
 
 `pstack` 没有专门的规划 `skill`，Cursor 自带的 Plan Mode 跟它配合得很好。遇到跨阶段或叠栈 PR 的任务，让 `/poteto-mode` 出计划会命中 [Multi-phase plan playbook](../poteto-mode/playbooks/multi-phase-plan.md)，它只交付计划不直接写代码。如果是设计分叉，先用 `Prototype` playbook 或 `/architect` 在代码里敲定。
 

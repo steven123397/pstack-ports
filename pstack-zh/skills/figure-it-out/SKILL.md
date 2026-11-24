@@ -28,7 +28,7 @@ disable-model-invocation: true
 
 - 开干之前先把验证 `harness` 搭起来，并从改动前的状态抓好基线，让后续每次检查都能直接呈现「旧值 vs 新值」。
 - 碰到不可逆的架构决策，调用 **architect** `skill`（它内部会跑 **arena**）。对于形态已经很具体的机械活，跳过这步。对已经拍板的设计再跑第二轮 `arena` 属于过度设计（参见 **laziness-protocol** `principle` `skill`）。
-- 决定哪些环节需要扇出。只在天然解耦的接缝处并行，给每个工人独立的 `worktree` 或分支（参见 **separate-before-serializing-shared-state** `principle` `skill`），别过度扇出。按 **poteto-mode** `skill` 的 Subagents 章节，为每个子代理选定匹配的推理档位与 fast/standard 速度。
+- 决定哪些环节需要扇出。只在天然解耦的接缝处并行，给每个工人独立的 `worktree` 或分支（参见 **separate-before-serializing-shared-state** `principle` `skill`），别过度扇出。按 **poteto-mode** `skill` 的 Subagents 章节，为每个子代理选定匹配的推理档位。
 - 把设计好的阶段清单明确写下来。这份清单就是给人审的。
 
 接着按设计执行。把具体步骤作为待办项插在 Phase C 和 Phase D 之间。每一步都在 Phase C 的实验循环纪律下执行，同时把 Phase D 的日志记录织进每一步里，每落一步就记一行，绝不要攒到最后再补整份记录。
