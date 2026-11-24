@@ -5,9 +5,9 @@
       "role": "pstack 英文原文，所有 port 的保真基线",
       "repo": "https://github.com/cursor/plugins.git",
       "subdir": "pstack",
-      "version": "0.15.42",
-      "commit": "bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7",
-      "commitDate": "2026-11-14",
+      "version": "0.15.48",
+      "commit": "9e278fe4d4ecd8bfe98b1b79bf4be662efb338cc",
+      "commitDate": "2026-11-23",
       "license": "MIT",
       "checkout": ".upstream/cursor-plugins",
       "sparse": ["pstack"]
@@ -44,8 +44,8 @@
     }
   },
   "counts": {
-    "skills": 58,
-    "playbooks": 23,
+    "skills": 59,
+    "playbooks": 22,
     "principles": 24,
     "agents": 2
   },

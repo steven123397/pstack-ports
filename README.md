@@ -1,6 +1,6 @@
 # pstack-ports
 
-基于 [cursor/plugins 的 pstack](https://github.com/cursor/plugins/tree/main/pstack)（当前锁定 `0.15.42` @ `bf0c7cd`，MIT）重建的**高质量中文精译与 `omp`（oh my pi）中文版适配仓库**。
+基于 [cursor/plugins 的 pstack](https://github.com/cursor/plugins/tree/main/pstack)（当前锁定 `0.15.48` @ `9e278fe`，MIT）重建的**高质量中文精译与 `omp`（oh my pi）中文版适配仓库**。
 
 ## 为什么推翻重来
 
@@ -18,7 +18,7 @@
 
 | 路径 | 用途 |
 | --- | --- |
-| [`UPSTREAM.json`](UPSTREAM.json) | 上游基线版本锁（`0.15.42` @ `bf0c7cd`）与参考源定义 |
+| [`UPSTREAM.json`](UPSTREAM.json) | 上游基线版本锁（`0.15.48` @ `9e278fe`）与参考源定义 |
 | [`GLOSSARY.md`](GLOSSARY.md) | 统一术语表、一词多义分译表与中文行文规范 |
 | [`.upstream/`](tools/upstream/sync.mjs) | 只读上游快照（gitignored），由 `node tools/upstream/sync.mjs` 拉取 |
 | [`docs/omp-platform-notes.md`](docs/omp-platform-notes.md) | 从 v1 归档打捞的 `omp` 实测平台事实与避坑备忘 |
