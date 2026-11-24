@@ -14,7 +14,7 @@ disable-model-invocation: true
 
 1. 明确说出每位参赛代理要交付什么产物。
 2. 提炼评分标准，写出 3 到 6 条针对*当前*任务、具体可打分的成功准则。这套标准是你在 Phase D 挑方案的尺子，参赛代理只看任务本身，不看评分标准。
-3. 选定参赛代理模型。读取 `~/.cursor/rules/pstack-models.mdc` 中的 `arena runners` 行。如果规则文件或该行缺失，默认各派一位 `claude-fable-5-2-high`、`claude-opus-5-5-high-fast` 和 `gemini-4-carbon-high`。这一行里出现 `auto` 或 `inherit-parent` 表示沿用父会话模型，调用时省略 `model` 参数即可。如果 `Task` 工具拒绝了某个配置项，就把该席位回退到它所属家族的默认模型并如实说明。模型家族按前缀划分，最长前缀优先匹配，分别是 `claude-fable-*`、`claude-*` 和 `gemini-*`；比较前先去掉开头的 `cursor-` 前缀。其他任意 `slug` 的家族取第一个连字符前的文本。各家族的默认模型就是上面默认列表里的对应项。如果该家族没有默认模型，或者 `Task` 工具连默认模型也拒绝，就从报错信息里挑同一家族最接近的合法 `slug`；实在没有，就裁掉该席位并说明。如果裁掉席位后剩余参赛代理少于两位，就补足到两位（如果配置行原本就只配了 1 项，则补足到 1 位）。补出来的参赛代理沿用剩余某位参赛代理的模型；如果一位都不剩，就省略 `model` 跑在父会话模型上，并如实说明。当擂台要覆盖多条不同设计路线时，可以多派几位参赛代理；当任务瓶颈在于生成多样性而非判断力时，也可以用同一个模型并跑 N 份。按 **poteto-mode** `skill` 的 Subagents 章节，为每个子代理选定匹配的推理档位与 fast/standard 速度。
+3. 从 `~/.cursor/rules/pstack-models.mdc` 的 `arena runners` 行挑选参赛代理，默认为 `claude-fable-5-2-high`、`claude-opus-5-5-high-fast` 和 `gemini-4-neon-xhigh`。`auto` 或 `inherit-parent` 条目表示沿用父会话模型，调用时省略 `model` 并派生 `generalPurpose`。如果 `Task` 工具拒绝了某个 `slug`，改用同家族最接近的合法 `slug`，或裁掉该席位，至少保留两位参赛代理，并如实说明。模型家族按前缀划分，最长前缀优先匹配，分别是 `claude-fable-*`、`claude-*` 和 `gemini-*`（比较前先去掉开头的 `cursor-` 前缀）。其他任意 `slug` 的家族取第一个连字符前的文本。需要探索多条设计方向时可多派几位参赛代理；当工作瓶颈在生成多样性而非判断力时，也可重复使用同一个模型。按 **poteto-mode** `skill` 的 Subagents 章节为每个子代理选定推理档位。
 4. 按 **separate-before-serializing-shared-state** `principle` `skill`，给每位参赛代理分配独占的输出位置（有条件就用 Git `worktree`，否则用 `/tmp/arena-<slug>/candidate-<n>/`）。
 
 ## Phase B：并行扇出
@@ -25,7 +25,7 @@ disable-model-invocation: true
 
 ## Phase C：跨家族裁判
 
-等 Phase B 全部参赛代理结束后，从 `~/.cursor/rules/pstack-models.mdc` 的 `arena cross-judge pool` 行里选一个模型。如果规则文件或该行缺失，从 `claude-fable-5-2-high`、`claude-opus-5-5-high-fast` 和 `gemini-4-carbon-high` 里选。派一个只读裁判子代理。这位裁判绝不能与父会话出自同一厂商。厂商的划分沿用 Phase A 第 3 步的家族定义，但 `claude-fable-*` 和 `claude-*` 合算同一厂商。按池子里的先后顺序，只尝试与父会话不同厂商的模型。`auto` 和 `inherit-parent` 等价于父会话模型，因此绝不充当裁判。用默认池时，Claude 父会话匹配 `gemini-4-carbon-high`；其他厂商的父会话先试 `claude-fable-5-2-high`，不行再试 `claude-opus-5-5-high-fast`。如果 `Task` 工具拒绝了某一项，就从报错信息里找同一模型最接近档位或速度的合法 `slug`；没有就顺移下一项。如果池子里没有异厂商模型能跑通，用同样方式去试默认池里的异厂商项。如果全都跑不通，跳过裁判环节，由你在 Phase D 独自挑选基底，并如实说明。如果你不知道父会话的模型是什么，就按池子顺序尝试真实 `slug`，并注明本次未执行异厂商校验。裁判拿到评分标准以及按路径标号的各候选方案，逐条打分，并给出带理由的基底推荐。它在你执行 Phase D 阅读的同时并行运行，绝不要在参赛代理还没写完时提前派发。
+等 Phase B 全部参赛代理完成后，从 `~/.cursor/rules/pstack-models.mdc` 的 `arena cross-judge pool` 行里选一个模型派生只读裁判，默认为 `claude-opus-5-5-high-fast`、`gemini-4-neon-xhigh`。这位裁判绝不能与父会话出自同一厂商，且 Fable 计入 Claude 厂商，因此取列表中第一个异厂商条目。`auto` 和 `inherit-parent` 等价于父会话模型。如果你不知道父会话的模型是什么，就取第一个真实 `slug`，并注明本次未执行异厂商校验。如果 `Task` 工具拒绝了某个 `slug`，先试同家族最接近的合法 `slug`，再顺移下一条异厂商条目，仍不行则跳过裁判环节，并如实说明。在你执行 Phase D 阅读的同时，裁判按路径标号对照每条评分标准给各候选方案打分并推荐基底。
 
 ## Phase D：选定基底方案
 

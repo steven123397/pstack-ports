@@ -15,36 +15,37 @@ description: "配置 pstack 各角色使用的模型与推理预算。自动检�
 
 ### 2. 读取当前配置
 
-默认的角色到模型映射见下面第 5 步给出的规则模板。如果 `~/.cursor/rules/pstack-models.mdc` 已经存在，先读取它，把其中的 `# budget` 行和各角色取值当作当前配置；否则从默认配置起步。如果某一行对应的角色不在第 5 步列表里（例如 `how explorer` 或 `why investigators`），说明它是已退役的旧角色，直接删掉。
+默认的角色到模型映射见下面第 5 步给出的规则模板。如果 `~/.cursor/rules/pstack-models.mdc` 已经存在，先读取它，把其中的 `# budget` 行和各角色取值当作当前配置；否则从默认配置起步。如果某一行对应的角色不在第 5 步列表里（例如 `hardest tasks`、`architect runners`、`reflect tooling` 或 `why investigators`），说明它是已退役的旧角色，直接删掉。
 
-如果已有规则文件里没有 `# defaults: 2` 这一行，说明它来自旧版配置流程。旧版流程会给每个角色都写一行，因此里面有些值是旧默认值，而不是用户主动选的。凡是匹配 `grok-*` 的都算旧 `slug`。进入第 3 步前，先按下面规则替换这些值：
+早期默认配置先后把其他 Gemini 模型和 `gemini-4-neon-high` 放进评审团席位。因此只要规则文件里任意评审团角色（`arena runners`、`arena cross-judge pool`、`interrogate reviewers`）出现 `gemini-4-neon-high`，或者非 `gemini-4-neon-*` 的 `gemini-4-*` 条目，都视为旧默认值，统一替换为 `gemini-4-neon-xhigh`。其他档位的 Gemini 4 Neon 条目视为用户主动选择并予以保留。把你替换了哪些条目告知用户。
 
-- 在 `feature, refactoring`、`bug-fix`、`perf-issue`、`hillclimb`、`reflect tooling` 或 `swarm workers` 里的旧 `slug`，换成第 5 步中该角色的默认值。
-- 在 `hardest tasks` 里的 `claude-opus-*` 值，换成第 5 步中该角色的默认值。
-- 在多模型评审团角色（`arena runners`、`arena cross-judge pool`、`architect runners`、`interrogate reviewers`）里，如果列表恰好包含一个 `claude-opus-*` 项和一个旧 `slug`（顺序不限），整个列表换成第 5 步的默认列表。其他列表里，把每个旧 `slug` 替换成 `claude-opus-5-5-high-fast`。
+如果已有规则文件里没有 `# defaults: 3` 这一行，说明它来自旧版配置流程。旧版流程会给每个角色都写一行，因此里面有些值是旧默认值，而不是用户主动选的。进入第 3 步前，先按下面规则替换这些值：
+
+- 如果 `arena cross-judge pool` 列表恰好包含一个 `claude-fable-*`、一个 `claude-opus-*` 和一个 `gemini-*`（顺序不限），直接换成第 5 步中该角色的默认列表。Fable 和 Opus 同属一家厂商，Fable 条目能评的场合 Opus 同样能评。
+- `# budget: unlimited` 改为 `large`，因为现在任何角色都不超过 `xhigh`。
+- 如果规则文件连 `# defaults: 2` 这一行也没有，凡是匹配 `grok-*` 的都算旧 `slug`。出现在 `feature, refactoring`、`bug-fix`、`perf-issue`、`hillclimb` 或 `swarm workers` 里的旧 `slug`，换成第 5 步中该角色的默认值。在评审团角色（`arena runners`、`arena cross-judge pool`、`interrogate reviewers`）里，如果列表恰好包含一个 `claude-opus-*` 项和一个旧 `slug`（顺序不限），整个列表换成第 5 步的默认列表。其他列表里，每个旧 `slug` 都替换成 `claude-opus-5-5-high-fast`。
 
 其余所有值一律视为用户自己的选择并予以保留，包括出现在其他角色里的旧 `slug`，以及所有的 `inherit-parent` 或 `auto`。把你替换了哪些值告知用户。
 
 ### 3. 选择预算、映射模型并确认
 
-**(a) 询问推理预算。** 优先使用 AskQuestion，不要用自由文本提问。提供下面四个选项，标签文字保持原样；如果规则文件里已记录预算，顺带报出当前预算。如果没有现成规则文件，说明 `large` 对应的就是 `skill` 默认值。
+**(a) 询问推理预算。** 优先使用 AskQuestion，不要用自由文本提问。提供下面三个选项，标签文字保持原样；如果规则文件里已记录预算，顺带报出当前预算。如果没有现成规则文件，说明 `large` 对应的就是 `skill` 默认值。
 
-- `unlimited — max reasoning`
 - `large — xhigh reasoning`
 - `medium — high reasoning`
 - `small — medium reasoning`
 
-**(b) 按预算换算模型。** 从 `skill` 默认值搭出工作表；如果是重跑配置，保留用户之前改过模型家族、列表或别名（`inherit-parent`、`auto`）的那些角色。模型家族按 **arena** `skill` Phase A 的定义划分，因此 Fable 单独算一个家族。每个角色都有一个目标推理档位，即把该角色默认值的档位按所选预算平移。档位阶梯为 `max` > `xhigh` > `high` > `medium` > `low`，`large` 保持不变，`unlimited` 上调一档，`medium` 下调一档，`small` 下调两档，碰到阶梯两端就停在端点。大多数默认配置都在 `xhigh`，各预算标签里标出的正是它们平移后的落点。把该角色下每个真实 `slug`（包含多模型评审团里的每一项）的档位段改成该角色的目标档位。档位段指的是最后一个词段，或者末尾 `fast` 前面的那个词段。如果拼出来的结果不在检测到的可用 `slug` 里，就改用同一家族里不超过目标档位的最高可用档位；再找不到，就把该角色标为需要人工指定。`inherit-parent` 和 `auto` 不做改动。举个例子，`unlimited` 会把 `claude-opus-5-5-xhigh` 变成 `claude-opus-5-5-max`，把 `claude-opus-5-5-high-fast` 变成 `claude-opus-5-5-xhigh-fast`，同时保持 `claude-fable-5-2-max` 不变。Gemini 最高只到 `high`，所以在 `unlimited` 下回退逻辑会让 `gemini-4-carbon-high` 保持原样。`small` 会把前两者变成 `claude-opus-5-5-medium` 和 `claude-opus-5-5-low-fast`。Fable 5.2 和 Gemini 都没有 fast 版 `slug`，绝不要拼出这类名字。
+**(b) 按预算换算模型。** 从 `skill` 默认值搭出工作表；如果是重跑配置，保留用户之前改过模型家族、列表或别名（`inherit-parent`、`auto`）的那些角色。模型家族按 **arena** `skill` Phase A 的定义划分，因此 Fable 单独算一个家族。每个角色都有一个目标推理档位，即把该角色默认值的档位按所选预算平移。档位阶梯为 `xhigh` > `high` > `medium` > `low`，`large` 保持不变，`medium` 下调一档，`small` 下调两档。任何角色都不超过 `xhigh`，目标触底时停在底端。大多数默认配置都在 `xhigh`，各预算标签里标出的正是它们平移后的落点。把该角色下每个真实 `slug`（包含评审团里的每一项）的档位段改成该角色的目标档位。档位段指的是最后一个词段，或者末尾 `fast` 前面的那个词段。如果拼出来的结果不在检测到的可用 `slug` 里，就改用同一家族里不超过目标档位的最高可用档位；再找不到，就把该角色标为需要人工指定。`inherit-parent` 和 `auto` 不做改动。因此，`medium` 会把 `claude-opus-5-5-xhigh-fast` 变成 `claude-opus-5-5-high-fast`，把 `claude-opus-5-5-high-fast` 变成 `claude-opus-5-5-medium-fast`；`small` 会把它们分别变成 `claude-opus-5-5-medium-fast` 和 `claude-opus-5-5-low-fast`。Opus 5.5 始终使用 `-fast` 版本，所以每个 Opus 5.5 取值都以 `-fast` 结尾。Fable 5.2 和 Gemini 都没有 fast 版 `slug`，绝不要拼出这类名字。Gemini 4 Neon 的 `slug` 从 `low` 到 `xhigh`，没有 `max` 或 `fast` 版本，因此它的席位默认跑在最高档 `gemini-4-neon-xhigh`。评审团角色里的 Gemini 4 Neon 条目使用独立的目标档位，即从 `xhigh` 按预算平移：`large` 保持 `gemini-4-neon-xhigh`，`medium` 写入 `gemini-4-neon-high`，`small` 写入 `gemini-4-neon-medium`。
 
-**(c) 展示各角色配置并确认。** 把每个角色及其对应模型列出来，凡是不在可用集合里的真实 `slug` 都标明需要重新选择，同时列出第 2 步删掉的退役角色行。询问用户是直接按此生效，还是调整特定角色；可选项给出检测到的全部模型，外加 `inherit-parent` 和 `auto`（两者都表示该角色沿用父对话模型，Auto 模式用户靠这个留在 Auto 上）。优先使用 AskQuestion 而不是自由文本。对于多模型评审团角色（`arena runners`、`architect runners`、`interrogate reviewers`），配置值是一个列表，每一项（包括别名项）都会启动一个子代理，列表长度直接决定并行数。`arena cross-judge pool` 也是列表，但 Arena 只跑一位裁判，它会按列表顺序只挑与父会话不同厂商的模型，因此按偏好先后排序。Fable 和其他 Claude 模型同属一家厂商。`inherit-parent` 和 `auto` 绝不充当跨家族裁判。`swarm workers` 是所有工人的默认模型，除非赛马或对比任务单独给各分支指定了不同模型。
+**(c) 展示各角色配置并确认。** 把每个角色及其对应模型列出来，凡是不在可用集合里的真实 `slug` 都标明需要重新选择，同时列出第 2 步删掉的退役角色行。询问用户是直接按此生效，还是调整特定角色；可选项给出检测到的 `xhigh` 及以下模型，外加 `inherit-parent` 和 `auto`（两者都表示该角色沿用父对话模型，Auto 模式用户靠这个留在 Auto 上）。优先使用 AskQuestion 而不是自由文本。对于多模型评审团角色（`arena runners`、`interrogate reviewers`），配置值是一个列表，每一项（包括别名项）都会启动一个子代理，列表长度直接决定并行数。`arena cross-judge pool` 也是列表，但 Arena 只跑一位裁判，它会按列表顺序只挑与父会话不同厂商的模型，因此按偏好先后排序。Fable 和其他 Claude 模型同属一家厂商。`inherit-parent` 和 `auto` 绝不充当跨家族裁判。`swarm workers` 是所有工人的默认模型，除非赛马或对比任务单独给各分支指定了不同模型。
 
 ### 4. 校验
 
-写入的每一个真实 `slug` 都必须位于已检测到的可用集合内。`inherit-parent` 和 `auto` 始终放行。如果用户选中的真实 `slug` 不可用，停下来重新确认。
+写入的每一个真实 `slug` 都必须位于已检测到的可用集合内，且档位在 `xhigh` 或以下。`inherit-parent` 和 `auto` 始终放行。如果用户选中的真实 `slug` 不可用，停下来重新确认。
 
 ### 5. 写入规则文件
 
-写入 `~/.cursor/rules/pstack-models.mdc`，带上 `alwaysApply: true`、`# defaults: 2` 行、写明所选标签和对应档位的 `# budget` 行，以及每个角色一行（角色名与 `poteto-mode` 保持一致）。整份覆盖写入，保证重跑幂等。格式如下：
+写入 `~/.cursor/rules/pstack-models.mdc`，带上 `alwaysApply: true`、`# defaults: 3` 行、写明所选标签和对应档位的 `# budget` 行，以及每个角色一行（角色名与 `poteto-mode` 保持一致）。整份覆盖写入，保证重跑幂等。格式如下：
 
 ```
 ---
@@ -52,22 +53,18 @@ description: pstack per-role model choices (overrides skill defaults)
 alwaysApply: true
 ---
 # pstack model configuration. One line per role. Delete a line to fall back to the skill default.
-# `inherit-parent` or `auto` as a value: the role runs on the parent chat model (omit Task `model`). Alias entries in a panel list still count toward its fan-out.
-# defaults: 2
+# `inherit-parent` or `auto` as a value: the role runs on the parent chat model (omit Task `model` and spawn `generalPurpose`). Alias entries in a panel list still count toward its fan-out.
+# defaults: 3
 # budget: large (xhigh)
-feature, refactoring: claude-opus-5-5-xhigh
-bug-fix: claude-opus-5-5-xhigh
-perf-issue: claude-opus-5-5-xhigh
-hillclimb: claude-opus-5-5-xhigh
-judgment and prose: claude-opus-5-5-xhigh
-hardest tasks: claude-fable-5-2-max
-reflect tooling: claude-opus-5-5-high-fast
-reflect judgment, divergent, synthesizer: claude-opus-5-5-xhigh
-arena runners: claude-fable-5-2-high, claude-opus-5-5-high-fast, gemini-4-carbon-high
-arena cross-judge pool: claude-fable-5-2-high, claude-opus-5-5-high-fast, gemini-4-carbon-high
+feature, refactoring: claude-opus-5-5-xhigh-fast
+bug-fix: claude-opus-5-5-xhigh-fast
+perf-issue: claude-opus-5-5-xhigh-fast
+hillclimb: claude-opus-5-5-xhigh-fast
+judgment and prose: claude-opus-5-5-xhigh-fast
+arena runners: claude-fable-5-2-high, claude-opus-5-5-high-fast, gemini-4-neon-xhigh
+arena cross-judge pool: claude-opus-5-5-high-fast, gemini-4-neon-xhigh
 swarm workers: claude-opus-5-5-high-fast
-architect runners: claude-fable-5-2-high, claude-opus-5-5-high-fast, gemini-4-carbon-high
-interrogate reviewers: claude-fable-5-2-high, claude-opus-5-5-high-fast, gemini-4-carbon-high
+interrogate reviewers: claude-fable-5-2-high, claude-opus-5-5-high-fast, gemini-4-neon-xhigh
 ```
 
 ### 6. 确认生效
