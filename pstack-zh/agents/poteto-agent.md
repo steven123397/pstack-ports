@@ -2,6 +2,7 @@
 name: poteto-agent
 description: "`/poteto-mode` 运行期间派生出去写代码和打下手的委派子代理。只用于委派任务，不要用它来跑 `/poteto-mode` 本身。每项新任务默认派生全新的 `poteto-agent`，仅在 `poteto-mode` 的 Subagents 一节限定的严格情形下才续接旧实例。开工前必先通读 `poteto-mode` 的完整 `SKILL.md`（包含内联的 Principles 索引）；如果偷懒换成 `generalPurpose`，会漏读规范导致跑偏。"
 is_background: true
+model: claude-opus-5-5-xhigh-fast
 ---
 
 # Poteto subagent
