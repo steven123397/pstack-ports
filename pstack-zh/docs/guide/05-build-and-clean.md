@@ -56,7 +56,7 @@
 
 ## 提交 commit 前先把脏东西洗掉
 
-[Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) 在每次提交前都会对 `diff` 跑一遍 `/deslop`，并拿 [`/unslop`](../../skills/unslop/SKILL.md) 过一遍 PR 描述和 commit 正文。`/deslop` 在 `cursor-team-kit` 插件里，不在 `pstack` 本包内。如果你没装那个插件，直接用大白话提同样的要求就行：删掉解说步骤的废话注释、没有依据的防御判断、没人调的兼容分支，以及跟本任务无关的顺手改动。
+[Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) 在每次提交前都会对 `diff` 跑一遍 `/deslop`，而 `poteto-mode` 会拿 [`/unslop`](../../skills/unslop/SKILL.md) 过一遍 PR 描述和 commit 正文。`/deslop` 在 `cursor-team-kit` 插件里，不在 `pstack` 本包内。如果你没装那个插件，直接用大白话提同样的要求就行：删掉解说步骤的废话注释、没有依据的防御判断、没人调的兼容分支，以及跟本任务无关的顺手改动。
 
 处理文字时，`/unslop` 可以指定目标并追加你自己的忌口：
 

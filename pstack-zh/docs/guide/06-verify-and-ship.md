@@ -131,7 +131,7 @@
 /poteto-mode 开一个 PR。整理成小步有序的 commit，描述里带上实跑证据。
 ```
 
-[Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) 会在 `worktree` 里把改动 rebase 成小步有序的 commit，清理 `diff`，给描述过一遍 `unslop`，最后把 PR 链接发给你。五个聚焦的小 PR 永远胜过一个臃肿的大 PR，叠栈跟进也永远胜过在一个分支上越堆越厚。
+[Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) 会在 `worktree` 里把改动 rebase 成小步可合入的 commit，清理 `diff`，把正文写成一分钟就能读完的简报，并直接以 ready 状态打开 PR。叠栈跟进永远胜过在一个分支上越堆越厚。
 
 ## 用 `Babysit` 把 PR 推到就绪可合入
 
@@ -141,7 +141,7 @@ PR 一开出来，各种阻碍马上就找上门了：检查挂了、评审提�
 /poteto-mode 帮我盯着这个 PR，把它跑绿。
 ```
 
-`Babysit` 会持续盯盘（在 GitHub 上用内置 watcher 脚本，本地配了 Origin CLI 时优先用 Origin），严格按顺序清障碍：先解冲突，再清评审评论，最后修 CI。所有已知修改都会攒成同一波推送，好让 CI 只重跑一次，而不是每改一行就触发一轮。对待评论一律保持怀疑，因为真人和 bot 都常常把真 bug 和噪音混在一起提；真问题就修，噪音就贴上确凿反证直接驳回。如果只是想问一下现状，把需求说轻一点，`Babysit` 会直接查完就报，不会开启轮询循环：
+`Babysit` 会持续盯盘（在 GitHub 上用内置 watcher 脚本，本地配了 Origin CLI 时优先用 Origin），严格按顺序清障碍：先解冲突，再清评审评论，最后修 CI。它绝不执行 rebase 或 force-push；遇到冲突或 base 分支过期时，会把需要 rebase 的分支报回给你。对待评论一律保持怀疑，因为真人和 bot 都常常把真 bug 和噪音混在一起提；真问题就修，噪音就贴上确凿反证直接驳回。如果只是想问一下现状，把需求说轻一点，`Babysit` 会直接查完就报，不会开启轮询循环：
 
 ```text
 /poteto-mode 看看 PR 123，还有什么没清的吗？

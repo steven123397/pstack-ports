@@ -71,7 +71,7 @@ flowchart TD
 
 ## 当过夜的不是单个任务，而是一整条队列
 
-上面的约定适合把单个任务推到单个完成条件。但有些晚上你要处理的是多个独立改动，甚至一整项跨天大工程。下面三个 `playbook` 把同样的信任机制往上放大。
+上面的约定适合把单个任务推到单个完成条件。但有些晚上你要处理的是多个独立改动，甚至一整项跨天大工程。下面两个 `playbook` 外加一个 `skill` 把同样的信任机制往上放大。
 
 [Autopilot-full](../../skills/poteto-mode/playbooks/autopilot-full.md) 负责把一条独立 PR 队列一路跑到全部合入。每个 PR 配一名主理代理从开发带到合入，且任何主理代理都不能靠自己拍板就合并。代码就绪后，由一组全新的验证 `swarm` 对这个 head 做独立验证；后续如果只是变基或小修，补派一名全新验证代理重验即可，只有加了新行为或改动幅度很大时才重新拉起整组 `swarm`。只有最终落地的这份补丁拿到干净的通过结论，才放行合入：
 
@@ -85,15 +85,15 @@ flowchart TD
 /poteto-mode 这五个改动跑 autopilot，但别点 merge，明早我自己来合。
 ```
 
-[Orchestrate](../../skills/poteto-mode/playbooks/orchestrate.md) 面向的是生命周期超过单个代理的大工程：跨多天、一串叠栈 PR，由一个常驻总控会话调度大批子代理。总控只管分配谁干哪块活、验收各路交回的成果，自己绝不写业务代码。如果一件事一个代理在单次会话里就能干完，这个 `playbook` 自己会把你引回上面的过夜单任务流程：
+像跨多包迁移这种整项大工程没有专属 `playbook`。`/poteto-mode` 会把体量庞大或跨切面极广的工作路由给 [`/figure-it-out`](../../skills/figure-it-out/SKILL.md)，由它量身设计一套严谨执行流程：
 
 ```text
-/poteto-mode 用 orchestrate 接管 store 迁移，一直跟到所有包都迁完合入为止，我每天来看两次进度。
+/poteto-mode 把所有包都迁到新 store，一直跟到每个包都迁完合入为止，我每天来看两次进度。
 ```
 
 ## 并行推进多个 Project
 
-[Cursor Project](https://cursor.com/blog/projects) 给总控代理提供了一条持久主线。总控不亲自写代码，只管指挥子代理；子代理默认跑在云端，哪怕你合上笔记本，活也照样往下推。这正是 `Orchestrate` playbook 最契合的运行形态。发给总控的 `prompt` 用 `/poteto-mode` 开头，它派出去的子代理就会自动遵守全套 `playbook`。
+[Cursor Project](https://cursor.com/blog/projects) 给总控代理提供了一条持久主线。总控不亲自写代码，只管指挥子代理；子代理默认跑在云端，哪怕你合上笔记本，活也照样往下推。发给总控的 `prompt` 用 `/poteto-mode` 开头，它派出去的子代理就会自动遵守全套 `playbook`。它启动的每一个代理都会先读 [`worker.md`](../../skills/poteto-mode/worker.md)，因此所有 worker 都会严守启动说明里的验收标准、自行拍板可撤回的决定而不来打扰你，并直接以 ready for review 状态打开 PR。
 
 几条好用的实战习惯：
 

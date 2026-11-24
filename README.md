@@ -23,7 +23,7 @@
 | [`.upstream/`](tools/upstream/sync.mjs) | 只读上游快照（gitignored），由 `node tools/upstream/sync.mjs` 拉取 |
 | [`docs/omp-platform-notes.md`](docs/omp-platform-notes.md) | 从 v1 归档打捞的 `omp` 实测平台事实与避坑备忘 |
 | [`tools/`](tools/) | 上游同步脚本与引用/结构校验脚本 |
-| `pstack-zh/` | 阶段一产物：忠于原版的中文版 `pstack`（待建） |
+| `pstack-zh/` | 阶段一产物：忠于原版的中文版 `pstack`（已完成 `0.15.48` 精译） |
 | `pstack-omp/` | 阶段二产物：基于 `pstack-zh/` 的中文版 `omp` 插件（待建） |
 
 > 之前的 v1 尝试（原英文 `pstack-omp`、`pstack-kimi`、`pstack-dsh`、`pstack-claude` 研读笔记）已完整封存在本地归档分支 `archive/v1-attempts`。

@@ -40,7 +40,7 @@ Claude Code 实际安装的是仓库根目录下 [`harness/pstack/`](https://git
 
 第一次用？[pstack 使用指南](./docs/guide/README.md) 会带你跑完第一个真实任务，从安装配置、写 `prompt` 一路讲到实跑验证和过夜挂机。卡住了或者拿不准该用哪个 `skill`，直接问 [`/poteto-help`](./skills/poteto-help/SKILL.md)。
 
-就这么简单。其他 `skill` 都是按场景触发的，`poteto-mode` 会在步骤需要时自动替你调用。开箱默认按模型强项分工：写代码委派（`Feature`、`Refactoring`、`Bug fix`、`Perf issue`、`Hillclimb`）、文本写作和判断交给 Opus 5.5，最棘手的硬骨头交给 Fable 5.2，默认多模型评审团是 Fable 5.2 / Opus 5.5 / Gemini 4 Carbon。任何一项都可以用 [`/setup-pstack`](./skills/setup-pstack/SKILL.md) 改掉。
+就这么简单。其他 `skill` 都是按场景触发的，`poteto-mode` 会在步骤需要时自动替你调用。开箱默认下，写代码委派（`Feature`、`Refactoring`、`Bug fix`、`Perf issue`、`Hillclimb`）、文本写作和判断全部交给 `xhigh` 档位的 Opus 5.5，且任何角色都不超过 `xhigh`。多模型评审团之外，Fable 5.2 只在你明确点名或同一份 `brief` 用 Opus 5.5 连续两次失败后才启用。默认多模型评审团是 Fable 5.2 / Opus 5.5 / Gemini 4 Neon。任何一项都可以用 [`/setup-pstack`](./skills/setup-pstack/SKILL.md) 改掉。
 
 ## 用法
 
@@ -50,7 +50,7 @@ Claude Code 实际安装的是仓库根目录下 [`harness/pstack/`](https://git
 
 ### 直接用 [`/poteto-mode`](./skills/poteto-mode/SKILL.md) 就行
 
-这是我最常用的主入口，只要需要代理严谨干活我就用它。里面内置了 23 个 `playbook`：
+这是我最常用的主入口，只要需要代理严谨干活我就用它。里面内置了 22 个 `playbook`：
 
 ```
 /poteto-mode 这个 PR 有个隐蔽 bug，空闲状态下每隔 750ms 滚动条就会自己漂移一下。先复现，再修复并验证。
@@ -61,7 +61,7 @@ Claude Code 实际安装的是仓库根目录下 [`harness/pstack/`](https://git
 ```
 
 <details>
-<summary>全部 23 个 playbook</summary>
+<summary>全部 22 个 playbook</summary>
 
 | playbook | 适用场景 |
 |---|---|
@@ -80,7 +80,6 @@ Claude Code 实际安装的是仓库根目录下 [`harness/pstack/`](https://git
 | [Babysit](./skills/poteto-mode/playbooks/babysit.md) | 把单个 PR 或叠栈 PR 推到已就绪可合入状态：清冲突、处理评审评论、盯绿 CI。 |
 | [Shipping](./skills/poteto-mode/playbooks/shipping.md) | 独立验证全绿 PR 栈，再把从栈底起连续验证通过的一段自下而上合入主干（默认 GitHub，本地有 Origin 时优先 Origin）。 |
 | [Autonomous run](./skills/poteto-mode/playbooks/autonomous-run.md) | 盯住完成条件不停歇跑完长任务。 |
-| [Orchestrate](./skills/poteto-mode/playbooks/orchestrate.md) | 交给单个总控会话长期托管的常驻项目：跨多天、多叠栈 PR、大批子代理协同。 |
 | [Autopilot-full](./skills/poteto-mode/playbooks/autopilot-full.md) | 一条独立 PR 队列从开发到合入全自主跑完，每个 PR 配一名主理代理。代码就绪后由 `swarm` 验明正身，后续补丁一有改动就重新验证。 |
 | [Autopilot-stack](./skills/poteto-mode/playbooks/autopilot-stack.md) | 去掉合入动作的 `Autopilot-full`。造完并验完 PR 交给操作者审查合入，仅在确实存在依赖时叠栈。 |
 | [Session pickup](./skills/poteto-mode/playbooks/session-pickup.md) | 断点续接或接管前任代理没干完的活。 |
@@ -124,6 +123,7 @@ Claude Code 实际安装的是仓库根目录下 [`harness/pstack/`](https://git
 | [`/poteto-help`](./skills/poteto-help/SKILL.md) | 刚接触 `pstack`，或拿不准该用哪个 `skill`、`playbook`、`principle`。先弄清你要干嘛、针对性解答，再给你一条可直接发出去的 `prompt`。只有主动敲 `/poteto-help` 才会触发。 |
 | [`/in-your-own-words`](./skills/in-your-own-words/SKILL.md) | 开工前先让代理用自己的话复述你的目标和要解决的问题。只有主动敲 `/in-your-own-words` 才会触发。 |
 | [`/sharpen`](./skills/sharpen/SKILL.md) | 发 `prompt` 前想把要求挖得更深（但不扩大任务范围）：点出顶尖专家会多做什么、从哪份最原始的材料入手、用什么方法和工具，以及什么外部证据能证明结果正确。它会返回重写后的 `prompt`，要求对能靠实验定夺的分叉先做原型验证，产品与偏好选择仍留给你。它自己不动手干活，只有主动敲 `/sharpen` 才会触发。 |
+| [`/reframe`](./skills/reframe/SKILL.md) | 说不清自己在做什么、因而没法向代理清晰提问时使用。直接从你的文件和原话出发；如果这段描述可能指向不止一个问题，先列出两到三种可能问题及区分信号并挑出最可能的一个。接着按对实现影响大小给出 8 到 12 个专业术语，每条对应到原话中的部分并附上亲自核验过链接的真实项目。再从 2 到 3 个用不同名字解决同类问题的邻近领域借词，讲清类比在何处失效，最后用新术语重写你的描述。只有主动敲 `/reframe` 才会触发。 |
 | [`/how`](./skills/how/SKILL.md) | 想听资深工程师视角把某个子系统的运行机制讲透。 |
 | [`/why`](./skills/why/SKILL.md) | 想知道某段代码当初为什么这么设计。只查历史记录不靠瞎猜：翻阅引入它的 commit、PR 讨论和后续历次变更，线索太薄时再往外查。严格引用原作者原话，标明哪些是推断，并直说哪些问题记录里没答案。 |
 | [`/recall`](./skills/recall/SKILL.md) | 开新活或续接旧活前，从你自己的近期对话和团队共享记录里把某个话题的上下文拼回来，交给你一份精炼的现状 `brief`。 |

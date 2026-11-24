@@ -1,6 +1,6 @@
 # 用 `/poteto-mode` 统领任务
 
-`/poteto-mode` 是整个插件的总入口。你给它一个目标，它会匹配内置的 23 个 `playbook` 之一，把对应步骤抄进待办清单，并在跑每一步时自动调起需要的其他 `skill`。这一页讲清楚一条好 `prompt` 长什么样，以及其实根本不需要写多长。
+`/poteto-mode` 是整个插件的总入口。你给它一个目标，它会匹配内置的 22 个 `playbook` 之一，把对应步骤抄进待办清单，并在跑每一步时自动调起需要的其他 `skill`。这一页讲清楚一条好 `prompt` 长什么样，以及其实根本不需要写多长。
 
 ![调度员扳动道岔，把轨道车上的机器人引向亮起的通道，上方出发牌写着 BUG FIX、FEATURE 和 INVESTIGATION。](./images/router.jpg)
 
@@ -25,7 +25,7 @@ flowchart TD
     J --> K
 ```
 
-上图只画了最常用的几条路。除此之外，插件里还备齐了针对单指标迭代优化（`Hillclimb`）、活进程或性能产物取证（`Runtime forensics` / `Trace forensics`）、低成本原型比选（`Prototype`）、像素级 UI 对齐（`Visual parity`）、编写与盲测 `skill`（`Authoring a skill` / `Eval`）、无人值守长跑（`Autonomous run`）、开 PR 与盯盘护航（`Opening a PR` / `Babysit`）、叠栈 PR 合入主干（`Shipping`）、队列或叠栈全自动推进（`Autopilot-full` / `Autopilot-stack`）、项目级协调编排（`Orchestrate`）、断点续接与安全挂起（`Session pickup` / `Pause safely`）、多阶段计划（`Multi-phase plan`）以及清理 `worktree`（`Worktree cleanup`）的 `playbook`。完整清单见 [playbook 目录](../../skills/poteto-mode/playbooks/)。
+上图只画了最常用的几条路。除此之外，插件里还备齐了针对单指标迭代优化（`Hillclimb`）、活进程或性能产物取证（`Runtime forensics` / `Trace forensics`）、低成本原型比选（`Prototype`）、像素级 UI 对齐（`Visual parity`）、编写与盲测 `skill`（`Authoring a skill` / `Eval`）、无人值守长跑（`Autonomous run`）、开 PR 与盯盘护航（`Opening a PR` / `Babysit`）、叠栈 PR 合入主干（`Shipping`）、队列或叠栈全自动推进（`Autopilot-full` / `Autopilot-stack`）、断点续接与安全挂起（`Session pickup` / `Pause safely`）、多阶段计划（`Multi-phase plan`）以及清理 `worktree`（`Worktree cleanup`）的 `playbook`。完整清单见 [playbook 目录](../../skills/poteto-mode/playbooks/)。
 
 ## 直接说目标，省去繁琐形式
 
@@ -35,7 +35,7 @@ flowchart TD
 /poteto-mode 重试之后用户会收到两条重复通知。先复现，再修复并验证。
 ```
 
-这就是一条典型的 `Bug fix` 任务 `prompt`。「先复现」不是客套话，而是硬约束，`playbook` 会严格照办。接下来你会看到待办清单里自动填满 `Bug fix` 的步骤；哪一步如果跳过，清单里也会留着并写上 `skip: <原因>`。
+这就是一条典型的 `Bug fix` 任务 `prompt`。「先复现」不是客套话，而是硬约束，`playbook` 会严格照办。接下来你会看到待办清单里自动填满 `Bug fix` 的步骤。
 
 ## 一条好 `prompt` 最多装这五件事
 
@@ -73,6 +73,14 @@ flowchart TD
 ```
 
 代理会先点出四件事：这个领域的顶尖专家会额外做哪些你没提的动作、他们会从哪份最原始的材料看起、会动用什么具体方法和工具，以及除了你和代理之外还有什么客观依据能证明结果是对的。然后它会把你的 `prompt` 重写一遍，挖得更深，但不扩大任务范围。重写后的 `prompt` 还会要求代理：凡是能靠跑实验定下来的分叉，先做原型观察再推荐方案；只有实验定不了的产品或偏好取舍，才留给你拍板。`/sharpen` 本身不会直接开工。你看完改好的 `prompt` 觉得合适，再配上 `/poteto-mode` 发出去就行。
+
+如果连自己想要的东西叫什么名都说不清楚，先拿原话和相关文件跑一遍 [`/reframe`](../../skills/reframe/SKILL.md)：
+
+```text
+/reframe 设置页里有的字段改完立刻保存，有的要点提交才保存，用户经常丢编辑内容。
+```
+
+代理会按对实现的影响大小给出 8 到 12 个专业术语，每个术语标明它对应你原话里的哪一块、附上一个核验过链接的真实项目，并说明学会这个词后能向代理提什么具体要求。它还会从 2 到 3 个用不同名字解决过同类问题的邻近领域借词，并讲清楚类比在什么地方失效。最后用新术语重写你的描述。你可以直接发这份重写稿，或者再拿它过一遍 `/sharpen`。
 
 ## 上下文有了，后续指令越短越好
 

@@ -28,7 +28,7 @@
 /reflect 刚才这轮耗太久了，把学到的教训收进 skill，下次别再重复踩坑。
 ```
 
-[`/reflect`](../../skills/reflect/SKILL.md) 会把当前对话记录发给三个并行审查代理，再由汇总代理把提议分进 `Accepted`、`Rejected` 和 `Backlog` 三类，等你拍板后再改任何 `skill`。只有真正能改变未来决策的提议才值得批。某一次偶发的离奇遭遇只是个案，不配升级成永久规则。
+[`/reflect`](../../skills/reflect/SKILL.md) 会直接通读对话记录，只保留真正能改变未来代理做法的教训，把提议分进 `Accepted`、`Rejected` 和 `Backlog` 三类，等你拍板后再改任何 `skill`。只有真正能改变未来决策的提议才值得批。某一次偶发的离奇遭遇只是个案，不配升级成永久规则。
 
 ## 用 `/correct` 从仓库环境里根治反复犯的错
 
